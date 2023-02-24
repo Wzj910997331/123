@@ -1,0 +1,43 @@
+{
+  "name": "cvitek-nvr",
+  "entry": "base",
+  "awtkRoot": "${AWTK_SDK_PATH}/awtk",
+  "assets": {
+    "activedTheme": "default",
+    "outputDir": "res",
+    "loadFrom": "any",
+    "const": "resource_data",
+    "screenDPR": "x1",
+    "defaultLanguage": "zh",
+    "defaultCountry": "CN",
+    "themes": {
+      "default": {
+        "activedSystemBar": "",
+        "activedBottomSystemBar": "",
+        "packaged": true,
+        "fonts": {
+          "default": {
+            "18": " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~",
+            "text": " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+          }
+        },
+        "lcd": {
+          "width": "1920",
+          "height": "1080",
+          "colorDepth": "16bit",
+          "colorFormat": "BGR(A)"
+        }
+      }
+    }
+  },
+  "modifyTime": "2022/04/27",
+  "creator": {
+    "name": "AWTK Designer",
+    "version": "1.1.4"
+  },
+  "awtkMvvmRoot": "${AWTK_SDK_PATH}/awtk-mvvm",
+  "type": "PROJECT_WIDGETS_APPLICATION",
+  "widgets": {
+    "date_picker": "1.0.0"
+  }
+}

@@ -1,0 +1,58 @@
+#################################################################
+###  RUN build/envsetup_soc.sh and select chip/board first
+#################################################################
+
+#################################################################
+###         Manual Configure Area
+###     Don't change other areas except this
+#################################################################
+# MANUAL CONFIG STARTS
+# SDK_VER: system's arch bit lengths
+SDK_VER ?= 64bit
+
+# APP_CUSTOM_TYPE: app's type
+# cvi_nvr: cvitek's nvr example code
+# cvi_demo: cvitek's cvi middleware functionality demo
+# pc_demo: cvitek's pc demo
+# yuanwei: custom yuanwei's demo code
+# ...
+#APP_CUSTOM_TYPE = yuanwei
+APP_CUSTOM_TYPE = cvi_nvr
+
+#SIMU_ENABLE = yes
+SIMU_ENABLE = no
+
+ENABLE_DEBUG = yes
+#ENABLE_DEBUG = no
+
+ENABLE_HDMI_OUTPUT = yes
+#ENABLE_HDMI_OUTPUT = no
+
+ENABLE_CVIAI = yes
+#ENABLE_CVIAI = no
+
+ENABLE_FACERECOGNITION = yes
+#ENABLE_FACERECOGNITION = no
+
+ARCH=arm64
+CROSS_COMPILE = aarch64-linux-gnu-
+TOOLCHAIN_PATH = $(SDK_PATH)/host-tools/gcc/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin
+
+CC = $(TOOLCHAIN_PATH)/$(CROSS_COMPILE)gcc
+CXX = $(TOOLCHAIN_PATH)/$(CROSS_COMPILE)g++
+AR = $(TOOLCHAIN_PATH)/$(CROSS_COMPILE)ar
+STRIP = $(TOOLCHAIN_PATH)/$(CROSS_COMPILE)strip
+
+ifeq ($(ENABLE_HDMI_OUTPUT),yes)
+GLOBAL_CC_OPTS += -DENABLE_HDMI_OUTPUT
+endif
+
+ifeq ($(ENABLE_CVIAI),yes)
+GLOBAL_CC_OPTS += -DENABLE_CVIAI
+endif
+
+ifeq ($(ENABLE_FACERECOGNITION),yes)
+ENABLE_CVIAI = yes
+GLOBAL_CC_OPTS += -DENABLE_CVIAI
+GLOBAL_CC_OPTS += -DENABLE_FACERECOGNITION
+endif

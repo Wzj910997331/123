@@ -1,0 +1,14 @@
+3rd
+*.o
+*.so
+*.a
+*.d
+*.sw[a-p]
+*.jpg
+*.png
+*.so.*
+.vscode/
+app/awtk_demo/design
+temp
+app/awtk_demo/res/
+opt/lt9611/
