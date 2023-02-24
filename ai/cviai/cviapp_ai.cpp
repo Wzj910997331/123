@@ -21,7 +21,7 @@
 #include "cvi_vdec.h"
 #include "cvi_venc.h"
 
-#include "cvimath.h"
+#include "core/cviai_core.h"
 
 #ifdef APP_YUANWEI
 #include "cvi_app_ai_handler.h" //yuanwei
@@ -175,9 +175,9 @@ static void initAiHandle_FaceTracking(cviai_handle_t *cviai_handle,
   CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_CreateHandle failed!");
   CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
-  s32Ret = CVI_AI_SetModelPath(*cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE,
+  s32Ret = CVI_AI_OpenModel(*cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE,
                                FACE_RETINA_PATH);
-  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
   CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
   s32Ret = CVI_AI_SetSkipVpssPreprocess(
@@ -197,41 +197,41 @@ static void initAiHandle_FaceTracking(cviai_handle_t *cviai_handle,
 
   // Tracking
   s32Ret =
-      CVI_AI_SetModelPath(*cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_D0,
+      CVI_AI_OpenModel(*cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_PEDESTRIAN,
                           OBJECT_DETECT_MODEL_PATH);
-  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
 
-  s32Ret = CVI_AI_SetModelPath(
+  s32Ret = CVI_AI_OpenModel(
       *cviai_handle, CVI_AI_SUPPORTED_MODEL_FACEQUALITY, FACE_QUALITY_PATH);
-  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
   CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
   s32Ret =
-      CVI_AI_SetModelPath(*cviai_handle, CVI_AI_SUPPORTED_MODEL_FACERECOGNITION,
+      CVI_AI_OpenModel(*cviai_handle, CVI_AI_SUPPORTED_MODEL_FACERECOGNITION,
                           FACE_RECOGNITION_PATH);
-  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
   CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
-  CVI_AI_SetModelThreshold(*cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_D0,
+  CVI_AI_SetModelThreshold(*cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_PEDESTRIAN,
                            OBJECT_DETECT_CONFIDENCE);
 
   s32Ret = CVI_AI_SetSkipVpssPreprocess(
-      *cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_D0, false);
+      *cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_PEDESTRIAN, false);
   CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS),
                     "CVI_AI_SetSkipVpssPreprocess failed!");
 
   // Init DeepSORT
-  CVI_AI_DeepSORT_Init(*cviai_handle);
+  CVI_AI_DeepSORT_Init(*cviai_handle, false);
 
   cvai_deepsort_config_t ds_conf;
   CVI_AI_DeepSORT_GetDefaultConfig(&ds_conf);
   ds_conf.ktracker_conf.max_unmatched_num = 10;
   ds_conf.ktracker_conf.accreditation_threshold = 10;
-  ds_conf.ktracker_conf.P_std_beta[2] = 0.1;
-  ds_conf.ktracker_conf.P_std_beta[6] = 2.5e-2;
-  ds_conf.kfilter_conf.Q_std_beta[2] = 0.1;
-  ds_conf.kfilter_conf.Q_std_beta[6] = 2.5e-2;
-  ds_conf.kfilter_conf.R_std_beta[2] = 0.1;
-  CVI_AI_DeepSORT_SetConfig(*cviai_handle, &ds_conf);
+  ds_conf.ktracker_conf.P_beta[2] = 0.1;
+  ds_conf.ktracker_conf.P_beta[6] = 2.5e-2;
+  ds_conf.kfilter_conf.Q_beta[2] = 0.1;
+  ds_conf.kfilter_conf.Q_beta[6] = 2.5e-2;
+  ds_conf.kfilter_conf.R_beta[2] = 0.1;
+  CVI_AI_DeepSORT_SetConfig(*cviai_handle, &ds_conf, -1, false);
 
   CVI_NVRLOGD("initAiHandle_FaceTracking  End....");
 
@@ -346,12 +346,12 @@ bool update_tracker(cviai_handle_t ai_handle, VIDEO_FRAME_INFO_S *frame,
           if (face_meta->info[i].face_quality >= QUALITY_THRESHOLD) {
             fq_trackers[j].quality = face_meta->info[i].face_quality;
             feature_copy(&fq_trackers[j].feature, &face_meta->info[i].feature);
-            CVI_S32 ret = CVI_AI_GetAlignedFace(
-                ai_handle, frame, &fq_trackers[j].face, &face_meta->info[i]);
-            if (ret != CVI_SUCCESS) {
-              printf("AI get aligned face failed(1).\n");
-              return false;
-            }
+            // CVI_S32 ret = CVI_AI_GetAlignedFace(
+            //     ai_handle, frame, &fq_trackers[j].face, &face_meta->info[i]);
+            // if (ret != CVI_SUCCESS) {
+            //   printf("AI get aligned face failed(1).\n");
+            //   return false;
+            // }
           }
           is_created = true;
           CVI_NVRLOGD("tracker_created!\n");
@@ -422,9 +422,10 @@ bool update_tracker(cviai_handle_t ai_handle, VIDEO_FRAME_INFO_S *frame,
         fq_trackers[match_idx].quality = face_meta->info[i].face_quality;
         feature_copy(&fq_trackers[match_idx].feature,
                      &face_meta->info[i].feature);
-        CVI_S32 ret = CVI_AI_GetAlignedFace(ai_handle, frame,
-                                            &fq_trackers[match_idx].face,
-                                            &face_meta->info[i]);
+        CVI_S32 ret = 0;
+        // CVI_S32 ret = CVI_AI_GetAlignedFace(ai_handle, frame,
+        //                                     &fq_trackers[match_idx].face,
+        //                                     &face_meta->info[i]);
         if (ret != CVI_SUCCESS) {
           printf("AI get aligned face failed(2).\n");
           return false;
@@ -465,9 +466,9 @@ static void *__cviAiBoxAiThread(void *args) {
   CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
   CVI_NVRLOGD("__cviAiBoxAiThread  VPSS ready");
 
-  s32Ret = CVI_AI_SetModelPath(cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE,
+  s32Ret = CVI_AI_OpenModel(cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE,
                                FACE_RETINA_PATH);
-  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
   CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
   CVI_NVRLOGD("__cviAiBoxAiThread  model ready");
 
@@ -619,101 +620,101 @@ static void *__cviAiBoxAiThread(void *args) {
 }
 
 // cvi_nvr Face Detection And Capture
-static void *__cviFaceCapThread(void *args) {
-  CVI_S32 s32Ret = CVI_SUCCESS;
-  CVIAPP_AiContext__S *pCtx = (CVIAPP_AiContext__S *)args;
-  cviai_handle_t cviai_handle;
+// static void *__cviFaceCapThread(void *args) {
+//   CVI_S32 s32Ret = CVI_SUCCESS;
+//   CVIAPP_AiContext__S *pCtx = (CVIAPP_AiContext__S *)args;
+//   cviai_handle_t cviai_handle;
 
-  CVI_NVRLOGD("__cviFaceCapThread  start....");
+//   CVI_NVRLOGD("__cviFaceCapThread  start....");
 
-  s32Ret = CVI_AI_CreateHandle2(&cviai_handle, 3, __VPSS_DEV_AI_HANDLE);
-  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_CreateHandle failed!");
-  CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
-  CVI_NVRLOGD("__cviAiBoxAiThread  VPSS ready");
+//   s32Ret = CVI_AI_CreateHandle2(&cviai_handle, 3, __VPSS_DEV_AI_HANDLE);
+//   CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_CreateHandle failed!");
+//   CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
+//   CVI_NVRLOGD("__cviAiBoxAiThread  VPSS ready");
 
-  s32Ret = CVI_AI_SetModelPath(cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE,
-                               FACE_RETINA_PATH);
-  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
-  CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
-  CVI_NVRLOGD("__cviAiBoxAiThread  model ready");
+//   s32Ret = CVI_AI_OpenModel(cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE,
+//                                FACE_RETINA_PATH);
+//   CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
+//   CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
+//   CVI_NVRLOGD("__cviAiBoxAiThread  model ready");
 
-  s32Ret = CVI_AI_SetSkipVpssPreprocess(
-      cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE, false);
-  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS),
-                    "CVI_AI_SetSkipVpssPreprocess failed!");
-  CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
-  CVI_NVRLOGD("__cviAiBoxAiThread  Disable prepocess ok");
+//   s32Ret = CVI_AI_SetSkipVpssPreprocess(
+//       cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE, false);
+//   CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS),
+//                     "CVI_AI_SetSkipVpssPreprocess failed!");
+//   CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
+//   CVI_NVRLOGD("__cviAiBoxAiThread  Disable prepocess ok");
 
-  s32Ret = CVI_AI_SetVpssTimeout(cviai_handle, 1200);
-  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetVpssTimeout failed!");
-  CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
-  CVI_NVRLOGD("__cviAiBoxAiThread  set VPSS timeout ok");
+//   s32Ret = CVI_AI_SetVpssTimeout(cviai_handle, 1200);
+//   CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetVpssTimeout failed!");
+//   CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
+//   CVI_NVRLOGD("__cviAiBoxAiThread  set VPSS timeout ok");
 
-  s32Ret = CVI_AI_APP_CreateHandle(&app_handle, ai_handle);
-  printf("to facecap init\n");
-  s32Ret = CVI_AI_APP_FaceCapture_Init(app_handle, (uint32_t)buffer_size);
-  printf("to quick setup\n");
+//   s32Ret = CVI_AI_APP_CreateHandle(&app_handle, ai_handle);
+//   printf("to facecap init\n");
+//   s32Ret = CVI_AI_APP_FaceCapture_Init(app_handle, (uint32_t)buffer_size);
+//   printf("to quick setup\n");
 
-  VIDEO_FRAME_INFO_S stVideoFrameInfo[CVIAPP_AIBOX_DEVICE_NUM_MAX];
-  memset(&stVideoFrameInfo, 0,
-         sizeof(VIDEO_FRAME_INFO_S) * CVIAPP_AIBOX_DEVICE_NUM_MAX);
+//   VIDEO_FRAME_INFO_S stVideoFrameInfo[CVIAPP_AIBOX_DEVICE_NUM_MAX];
+//   memset(&stVideoFrameInfo, 0,
+//          sizeof(VIDEO_FRAME_INFO_S) * CVIAPP_AIBOX_DEVICE_NUM_MAX);
 
-  CVI_NVRLOGD("__cviAiBoxAiThread  pCtx->bEnable=%d", pCtx->bEnable);
+//   CVI_NVRLOGD("__cviAiBoxAiThread  pCtx->bEnable=%d", pCtx->bEnable);
 
-  while (pCtx->bEnable) {
-    for (int i = 0; i < CVIAPP_AIBOX_DEVICE_NUM_MAX; i++) {
-      if (NULL != pCtx->stParam.pGetFrameFun) {
+//   while (pCtx->bEnable) {
+//     for (int i = 0; i < CVIAPP_AIBOX_DEVICE_NUM_MAX; i++) {
+//       if (NULL != pCtx->stParam.pGetFrameFun) {
 
-        if (pCtx->stParam.pGetFrameFun(i, &stVideoFrameInfo[i]) == 0) {
+//         if (pCtx->stParam.pGetFrameFun(i, &stVideoFrameInfo[i]) == 0) {
 
-          // face
-          cvai_face_t face;
-          memset(&face, 0, sizeof(cvai_face_t));
+//           // face
+//           cvai_face_t face;
+//           memset(&face, 0, sizeof(cvai_face_t));
 
-          s32Ret = CVI_AI_RetinaFace(cviai_handle, &stVideoFrameInfo[i], &face);
-          CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS),
-                            "CVI_AI_RetinaFace failed!");
-          // CVI_NVRLOGD("__cviAiBoxAiThread CVI_AI_RetinaFace success(%d),
-          // face.size=%d", s32Ret,face.size);
+//           s32Ret = CVI_AI_RetinaFace(cviai_handle, &stVideoFrameInfo[i], &face);
+//           CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS),
+//                             "CVI_AI_RetinaFace failed!");
+//           // CVI_NVRLOGD("__cviAiBoxAiThread CVI_AI_RetinaFace success(%d),
+//           // face.size=%d", s32Ret,face.size);
 
-          if (CVI_SUCCESS == s32Ret && face.size != 0) {
-            if (NULL != pCtx->stParam.pNotifyFun) {
-              CVIAPP_AiResult_S result;
-              CVIAPP_AiResultInfo_S resultInfo;
+//           if (CVI_SUCCESS == s32Ret && face.size != 0) {
+//             if (NULL != pCtx->stParam.pNotifyFun) {
+//               CVIAPP_AiResult_S result;
+//               CVIAPP_AiResultInfo_S resultInfo;
 
-              memset(&result, 0, sizeof(CVIAPP_AiResult_S));
-              memset(&resultInfo, 0, sizeof(CVIAPP_AiResultInfo_S));
-              resultInfo.face = face;
+//               memset(&result, 0, sizeof(CVIAPP_AiResult_S));
+//               memset(&resultInfo, 0, sizeof(CVIAPP_AiResultInfo_S));
+//               resultInfo.face = face;
 
-              result.eType = CVIAPP_AI_CVINVRTHREAD;
-              // result.pResult = (void*) &face;
-              result.pResult = (void *)&resultInfo;
-              pCtx->stParam.pNotifyFun(i, &result);
-            } else {
-              CVI_NVRLOGD("__cviAiBoxAiThread pNotifyFun is NULL");
-            }
-          }
+//               result.eType = CVIAPP_AI_CVINVRTHREAD;
+//               // result.pResult = (void*) &face;
+//               result.pResult = (void *)&resultInfo;
+//               pCtx->stParam.pNotifyFun(i, &result);
+//             } else {
+//               CVI_NVRLOGD("__cviAiBoxAiThread pNotifyFun is NULL");
+//             }
+//           }
 
-          CVI_AI_Free(&face);
+//           CVI_AI_Free(&face);
 
-          if (NULL != pCtx->stParam.pReleaseFrameFun) {
-            pCtx->stParam.pReleaseFrameFun(i, &stVideoFrameInfo[i]);
-            releaseFrameStatus[i] = 1;
-          }
-        } else {
-          releaseFrameStatus[i] = 0;
-        }
-      }
-    }
-  }
+//           if (NULL != pCtx->stParam.pReleaseFrameFun) {
+//             pCtx->stParam.pReleaseFrameFun(i, &stVideoFrameInfo[i]);
+//             releaseFrameStatus[i] = 1;
+//           }
+//         } else {
+//           releaseFrameStatus[i] = 0;
+//         }
+//       }
+//     }
+//   }
 
-  s32Ret = CVI_AI_DestroyHandle(cviai_handle);
-  CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_DestroyHandle failed!");
+//   s32Ret = CVI_AI_DestroyHandle(cviai_handle);
+//   CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_DestroyHandle failed!");
 
-  CVI_NVRLOGD("\n#__cviAiBoxAiThread  end....");
+//   CVI_NVRLOGD("\n#__cviAiBoxAiThread  end....");
 
-  return NULL;
-}
+//   return NULL;
+// }
 
 #if 0
 //cvi_nvr_Region
@@ -744,15 +745,15 @@ static void *__cviNvrAiRegionalInvasionThread(void *args)
         CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_Service_CreateHandle failed!");
         CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
-        s32Ret = CVI_AI_SetModelPath(cviai_handle[i], CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_D0, OBJECT_DETECT_MODEL_PATH);
-        CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+        s32Ret = CVI_AI_OpenModel(cviai_handle[i], CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_PEDESTRIAN, OBJECT_DETECT_MODEL_PATH);
+        CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
         CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
-        s32Ret = CVI_AI_SetModelThreshold(cviai_handle[i], CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_D0, OBJECT_DETECT_CONFIDENCE);
+        s32Ret = CVI_AI_SetModelThreshold(cviai_handle[i], CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_PEDESTRIAN, OBJECT_DETECT_CONFIDENCE);
         CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelThreshold failed!");
         CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
-        s32Ret = CVI_AI_SetSkipVpssPreprocess(cviai_handle[i], CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_D0, false);
+        s32Ret = CVI_AI_SetSkipVpssPreprocess(cviai_handle[i], CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_PEDESTRIAN, false);
         CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetSkipVpssPreprocess failed!");
         CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
@@ -1163,27 +1164,27 @@ static void *__aiRFAndODThread(void *args)
     CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_CreateHandle1 failed!");
     CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
-    s32Ret = CVI_AI_SetModelPath(cviai_handle_1, CVI_AI_SUPPORTED_MODEL_RETINAFACE, FACE_RETINA_PATH);
-    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+    s32Ret = CVI_AI_OpenModel(cviai_handle_1, CVI_AI_SUPPORTED_MODEL_RETINAFACE, FACE_RETINA_PATH);
+    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
     CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
-    s32Ret = CVI_AI_SetModelPath(cviai_handle_1, CVI_AI_SUPPORTED_MODEL_FACEQUALITY, FACE_QUALITY_PATH);
-    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+    s32Ret = CVI_AI_OpenModel(cviai_handle_1, CVI_AI_SUPPORTED_MODEL_FACEQUALITY, FACE_QUALITY_PATH);
+    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
     CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
-    s32Ret = CVI_AI_SetModelPath(cviai_handle_1, CVI_AI_SUPPORTED_MODEL_FACERECOGNITION, FACE_RECOGNITION_PATH);
-    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+    s32Ret = CVI_AI_OpenModel(cviai_handle_1, CVI_AI_SUPPORTED_MODEL_FACERECOGNITION, FACE_RECOGNITION_PATH);
+    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
     CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
-    s32Ret = CVI_AI_SetModelPath(cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_D0, OBJECT_DETECT_MODEL_PATH);
-    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+    s32Ret = CVI_AI_OpenModel(cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_PEDESTRIAN, OBJECT_DETECT_MODEL_PATH);
+    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
     CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
-    s32Ret = CVI_AI_SetModelThreshold(cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_D0, OBJECT_DETECT_CONFIDENCE);
+    s32Ret = CVI_AI_SetModelThreshold(cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_PEDESTRIAN, OBJECT_DETECT_CONFIDENCE);
     CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelThreshold failed!");
     CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
-    s32Ret = CVI_AI_SetSkipVpssPreprocess(cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_D0, false);
+    s32Ret = CVI_AI_SetSkipVpssPreprocess(cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_PEDESTRIAN, false);
     CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetSkipVpssPreprocess failed!");
     CVI_NVRLOG_ASSERT((s32Ret == CVI_SUCCESS));
 
@@ -1427,14 +1428,14 @@ static void *__aiRetinaFaceThread(void *args)
     s32Ret = CVI_AI_CreateHandle(&pCtx->cviai_handle);
     CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_CreateHandle failed!");
 
-    s32Ret = CVI_AI_SetModelPath(pCtx->cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE, pCtx->stParam.pModelPath);
-    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+    s32Ret = CVI_AI_OpenModel(pCtx->cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE, pCtx->stParam.pModelPath);
+    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
 
-    s32Ret = CVI_AI_SetModelPath(pCtx->cviai_handle, CVI_AI_SUPPORTED_MODEL_FACEQUALITY, FACE_QUALITY_PATH);
-    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+    s32Ret = CVI_AI_OpenModel(pCtx->cviai_handle, CVI_AI_SUPPORTED_MODEL_FACEQUALITY, FACE_QUALITY_PATH);
+    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
 
-    s32Ret = CVI_AI_SetModelPath(pCtx->cviai_handle, CVI_AI_SUPPORTED_MODEL_FACERECOGNITION, FACE_RECOGNITION_PATH);
-    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+    s32Ret = CVI_AI_OpenModel(pCtx->cviai_handle, CVI_AI_SUPPORTED_MODEL_FACERECOGNITION, FACE_RECOGNITION_PATH);
+    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
 
     s32Ret = CVI_AI_SetSkipVpssPreprocess(pCtx->cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE, false);
     CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetSkipVpssPreprocess failed!");
@@ -1580,13 +1581,10 @@ static void *__aiObjectDetectThread(void *args) {
   CVI_NVRLOGD("__aiObjectDetectThread thread start...");
 
   CVI_AI_CreateHandle2(&cviai_handle, 3, __VPSS_DEV_AI_HANDLE);
-  CVI_AI_SetModelPath(cviai_handle,
-                      CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_PEDESTRIAN,
-                      PD_MODEL_PATH);
   CVI_AI_SetSkipVpssPreprocess(
       cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_PEDESTRIAN, false);
   CVI_AI_OpenModel(cviai_handle, CVI_AI_SUPPORTED_MODEL_MOBILEDETV2_PEDESTRIAN,
-                   OBJECT_DETECT_CONFIDENCE);
+                   PD_MODEL_PATH);
 
   VIDEO_FRAME_INFO_S stVideoFrameInfo[CVIAPP_AIBOX_DEVICE_NUM_MAX];
   memset(&stVideoFrameInfo, 0,
@@ -1603,8 +1601,7 @@ static void *__aiObjectDetectThread(void *args) {
         if (pCtx->stParam.pGetFrameFun(i, &stVideoFrameInfo[i]) == 0) {
           cvai_object_t obj_meta;
           memset(&obj_meta, 0, sizeof(cvai_object_t));
-          s32Ret = CVI_AI_MobileDetV2_D0(cviai_handle, &stVideoFrameInfo[i],
-                                         &obj_meta, CVI_DET_TYPE_PEOPLE);
+          s32Ret = CVI_AI_MobileDetV2_Pedestrian(cviai_handle, &stVideoFrameInfo[i], &obj_meta);
 
           if (CVI_SUCCESS == s32Ret && obj_meta.size != 0) {
             if (NULL != pCtx->stParam.pNotifyFun) {
@@ -2264,9 +2261,9 @@ CVI_ERROR_CODE_E _CVIAPP_AiGetFeature(const char *db_img_dir, const char *db_fea
     return ret;
   }
 
-  ret = CVI_AI_SetModelPath(facelib_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE, FACE_RETINA_PATH);
-  ret |= CVI_AI_SetModelPath(facelib_handle, CVI_AI_SUPPORTED_MODEL_FACERECOGNITION, FACE_RECOGNITION_PATH);
-  ret |= CVI_AI_SetModelPath(facelib_handle, CVI_AI_SUPPORTED_MODEL_FACEQUALITY, FACE_QUALITY_PATH);
+  ret = CVI_AI_OpenModel(facelib_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE, FACE_RETINA_PATH);
+  ret |= CVI_AI_OpenModel(facelib_handle, CVI_AI_SUPPORTED_MODEL_FACERECOGNITION, FACE_RECOGNITION_PATH);
+  ret |= CVI_AI_OpenModel(facelib_handle, CVI_AI_SUPPORTED_MODEL_FACEQUALITY, FACE_QUALITY_PATH);
   if (ret != CVI_SUCCESS) {
     CVI_NVRLOGD("Set model retinaface failed with %#x!\n", ret);
     return ret;
@@ -2354,14 +2351,14 @@ CVI_ERROR_CODE_E _CVIAPP_AiSearchMatchFaceCount(const char *img_dir, int *matchN
     s32Ret = CVI_AI_Service_CreateHandle(&service_handle, &cviai_handle);
     CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_CreateHandle1 failed!");
 
-    s32Ret = CVI_AI_SetModelPath(cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE, FACE_RETINA_PATH);
-    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+    s32Ret = CVI_AI_OpenModel(cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE, FACE_RETINA_PATH);
+    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
 
-    s32Ret = CVI_AI_SetModelPath(cviai_handle, CVI_AI_SUPPORTED_MODEL_FACEQUALITY, FACE_QUALITY_PATH);
-    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+    s32Ret = CVI_AI_OpenModel(cviai_handle, CVI_AI_SUPPORTED_MODEL_FACEQUALITY, FACE_QUALITY_PATH);
+    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
 
-    s32Ret = CVI_AI_SetModelPath(cviai_handle, CVI_AI_SUPPORTED_MODEL_FACERECOGNITION, FACE_RECOGNITION_PATH);
-    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetModelPath failed!");
+    s32Ret = CVI_AI_OpenModel(cviai_handle, CVI_AI_SUPPORTED_MODEL_FACERECOGNITION, FACE_RECOGNITION_PATH);
+    CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_OpenModel failed!");
 
     s32Ret = CVI_AI_SetSkipVpssPreprocess(cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE, false);
     CVI_NVRLOGW_CHECK((s32Ret != CVI_SUCCESS), "CVI_AI_SetSkipVpssPreprocess failed!");

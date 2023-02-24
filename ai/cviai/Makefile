@@ -17,7 +17,6 @@ CC_OPTS += $(GLOBAL_CC_OPTS)
 
 INC_DIR += -I./include
 INC_DIR += -I$(NVR_ROOT_PATH)/ai/include
-INC_DIR += -I$(NVR_ROOT_PATH)/ai/include/cviai
 INC_DIR += -I$(NVR_ROOT_PATH)/ai/include/cvimath
 
 INC_DIR += -I$(NVR_ROOT_PATH)/common

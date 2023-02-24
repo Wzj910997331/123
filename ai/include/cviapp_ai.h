@@ -3,8 +3,9 @@
 
 #include "cvi_common_type.h"
 #include "cvi_const_error.h"
-#include "cviai.h"
+#include "cviapp_ai.h"
 
+#include "core/cviai_core.h"
 #include "cvi_const_error.h"
 #include "cvi_nvrlog.h"
 #include "cvi_platform.h"

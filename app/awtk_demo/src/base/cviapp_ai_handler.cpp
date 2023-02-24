@@ -19,7 +19,7 @@
 #ifdef ENABLE_CVIAI
 
 #include "cviapp_ai_handler.h"
-#include "cviai.h"
+#include "cviapp_ai.h"
 
 static idle_func_t g_chnNotifyList[CVIAPP_PREVIEW_MAX_IPC_VIEW];
 static void *g_ipcViewPointer[CVIAPP_PREVIEW_MAX_IPC_VIEW];
