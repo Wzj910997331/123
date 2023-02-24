@@ -19,15 +19,15 @@
  *
  */
 
+#include "mouse_thread.h"
+#include "base/keys.h"
+#include "tkc/mem.h"
+#include "tkc/thread.h"
+#include "tkc/utils.h"
 #include <errno.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <linux/input.h>
-#include "tkc/mem.h"
-#include "base/keys.h"
-#include "tkc/thread.h"
-#include "mouse_thread.h"
-#include "tkc/utils.h"
+#include <unistd.h>
 
 #ifndef EV_SYN
 #define EV_SYN 0x00
@@ -41,8 +41,8 @@ typedef struct _run_info_t {
   int32_t y;
   int32_t max_x;
   int32_t max_y;
-  void* dispatch_ctx;
-  char* filename;
+  void *dispatch_ctx;
+  char *filename;
   input_dispatch_t dispatch;
   union {
     int8_t d[3];
@@ -56,7 +56,7 @@ typedef struct _run_info_t {
   bool_t enable;
 } run_info_t;
 
-static ret_t input_dispatch(run_info_t* info) {
+static ret_t input_dispatch(run_info_t *info) {
   ret_t ret = info->dispatch(info->dispatch_ctx, &(info->req), "mouse");
   info->req.event.type = EVT_NONE;
 
@@ -64,7 +64,9 @@ static ret_t input_dispatch(run_info_t* info) {
 }
 
 /* Set mouse wheel events */
-static ret_t input_dispatch_set_mouse_wheel_event(run_info_t* info, event_queue_req_t* req, int32_t dy) {
+static ret_t input_dispatch_set_mouse_wheel_event(run_info_t *info,
+                                                  event_queue_req_t *req,
+                                                  int32_t dy) {
   if (dy > 0) {
     req->wheel_event.dy = tk_max(MIN_WHEEL_DELTA, dy);
   } else if (dy < 0) {
@@ -74,7 +76,10 @@ static ret_t input_dispatch_set_mouse_wheel_event(run_info_t* info, event_queue_
   return RET_OK;
 }
 
-static ret_t input_dispatch_set_mouse_event(run_info_t* info, event_queue_req_t* req, bool_t left, bool_t right, bool_t middle, bool_t normal) {
+static ret_t input_dispatch_set_mouse_event(run_info_t *info,
+                                            event_queue_req_t *req, bool_t left,
+                                            bool_t right, bool_t middle,
+                                            bool_t normal) {
   if (normal) {
     if (info->left_pressed || info->rigth_pressed || info->middle_pressed) {
       if (info->left_pressed) {
@@ -117,9 +122,9 @@ static ret_t input_dispatch_set_mouse_event(run_info_t* info, event_queue_req_t*
   return RET_OK;
 }
 
-static ret_t input_dispatch_one_event(run_info_t* info) {
+static ret_t input_dispatch_one_event(run_info_t *info) {
   int ret = 0;
-  event_queue_req_t* req = &(info->req);
+  event_queue_req_t *req = &(info->req);
 
   if (info->fd < 0) {
     ret = -1;
@@ -127,7 +132,7 @@ static ret_t input_dispatch_one_event(run_info_t* info) {
     ret = read(info->fd, &info->data.e, sizeof(info->data.e));
   }
 
-  if(!info->enable) {
+  if (!info->enable) {
     return RET_OK;
   }
 
@@ -141,12 +146,12 @@ static ret_t input_dispatch_one_event(run_info_t* info) {
 
       info->fd = open(info->filename, O_RDONLY);
       if (info->fd < 0) {
-        log_debug("%s:%d: open mouse failed, fd=%d, filename=%s\n", __func__, __LINE__, info->fd,
-                  info->filename);
-        //perror("print mouse: ");
+        log_debug("%s:%d: open mouse failed, fd=%d, filename=%s\n", __func__,
+                  __LINE__, info->fd, info->filename);
+        // perror("print mouse: ");
       } else {
-        log_debug("%s:%d: open mouse successful, fd=%d, filename=%s\n", __func__, __LINE__,
-                  info->fd, info->filename);
+        log_debug("%s:%d: open mouse successful, fd=%d, filename=%s\n",
+                  __func__, __LINE__, info->fd, info->filename);
       }
     }
   }
@@ -182,129 +187,130 @@ static ret_t input_dispatch_one_event(run_info_t* info) {
     input_dispatch(info);
   } else if (ret == sizeof(info->data.e)) {
     switch (info->data.e.type) {
-      case EV_KEY: {
-        bool_t left = info->data.e.value && (info->data.e.code == BTN_LEFT || info->data.e.code == BTN_TOUCH);
-        bool_t right = info->data.e.value && info->data.e.code == BTN_RIGHT;
-        bool_t middle = info->data.e.value && info->data.e.code == BTN_MIDDLE;
-        bool_t normal = !(left || right || middle);
-        input_dispatch_set_mouse_event(info, req, left, right, middle, normal);
+    case EV_KEY: {
+      bool_t left = info->data.e.value && (info->data.e.code == BTN_LEFT ||
+                                           info->data.e.code == BTN_TOUCH);
+      bool_t right = info->data.e.value && info->data.e.code == BTN_RIGHT;
+      bool_t middle = info->data.e.value && info->data.e.code == BTN_MIDDLE;
+      bool_t normal = !(left || right || middle);
+      input_dispatch_set_mouse_event(info, req, left, right, middle, normal);
+      break;
+    }
+    case EV_ABS: {
+      switch (info->data.e.code) {
+      case ABS_X: {
+        req->pointer_event.x = info->data.e.value;
         break;
       }
-      case EV_ABS: {
-        switch (info->data.e.code) {
-          case ABS_X: {
-            req->pointer_event.x = info->data.e.value;
-            break;
-          }
-          case ABS_Y: {
-            req->pointer_event.y = info->data.e.value;
-            break;
-          }
-          default:
-            break;
-        }
-
-        if (req->event.type == EVT_NONE) {
-          req->event.type = EVT_POINTER_MOVE;
-        }
-
-        break;
-      }
-      case EV_REL: {
-        switch (info->data.e.code) {
-          case REL_X: {
-            req->pointer_event.x += info->data.e.value;
-
-            if (req->pointer_event.x < 0) {
-              req->pointer_event.x = 0;
-            }
-            if (req->pointer_event.x > info->max_x) {
-              req->pointer_event.x = info->max_x;
-            }
-            break;
-          }
-          case REL_Y: {
-            req->pointer_event.y += info->data.e.value;
-            if (req->pointer_event.y < 0) {
-              req->pointer_event.y = 0;
-            }
-            if (req->pointer_event.y > info->max_y) {
-              req->pointer_event.y = info->max_y;
-            }
-            break;
-          }
-          case REL_WHEEL: {
-            int32_t dy = MIN_WHEEL_DELTA * info->data.e.value;
-            /* Convert this event to the wheel event of awtk */
-            input_dispatch_set_mouse_wheel_event(info, req, dy);
-            break;
-          }
-          default:
-            break;
-        }
-
-        if (req->event.type == EVT_NONE) {
-          req->event.type = EVT_POINTER_MOVE;
-        }
-
-        break;
-      }
-      case EV_SYN: {
-        switch (req->event.type) {
-          case EVT_KEY_UP:
-          case EVT_KEY_DOWN:
-          case EVT_CONTEXT_MENU:
-          case EVT_POINTER_DOWN:
-          case EVT_POINTER_MOVE:
-          case EVT_POINTER_UP:
-          case EVT_WHEEL: {
-            return input_dispatch(info);
-          }
-          default:
-            break;
-        }
+      case ABS_Y: {
+        req->pointer_event.y = info->data.e.value;
         break;
       }
       default:
         break;
+      }
+
+      if (req->event.type == EVT_NONE) {
+        req->event.type = EVT_POINTER_MOVE;
+      }
+
+      break;
+    }
+    case EV_REL: {
+      switch (info->data.e.code) {
+      case REL_X: {
+        req->pointer_event.x += info->data.e.value;
+
+        if (req->pointer_event.x < 0) {
+          req->pointer_event.x = 0;
+        }
+        if (req->pointer_event.x > info->max_x) {
+          req->pointer_event.x = info->max_x;
+        }
+        break;
+      }
+      case REL_Y: {
+        req->pointer_event.y += info->data.e.value;
+        if (req->pointer_event.y < 0) {
+          req->pointer_event.y = 0;
+        }
+        if (req->pointer_event.y > info->max_y) {
+          req->pointer_event.y = info->max_y;
+        }
+        break;
+      }
+      case REL_WHEEL: {
+        int32_t dy = MIN_WHEEL_DELTA * info->data.e.value;
+        /* Convert this event to the wheel event of awtk */
+        input_dispatch_set_mouse_wheel_event(info, req, dy);
+        break;
+      }
+      default:
+        break;
+      }
+
+      if (req->event.type == EVT_NONE) {
+        req->event.type = EVT_POINTER_MOVE;
+      }
+
+      break;
+    }
+    case EV_SYN: {
+      switch (req->event.type) {
+      case EVT_KEY_UP:
+      case EVT_KEY_DOWN:
+      case EVT_CONTEXT_MENU:
+      case EVT_POINTER_DOWN:
+      case EVT_POINTER_MOVE:
+      case EVT_POINTER_UP:
+      case EVT_WHEEL: {
+        return input_dispatch(info);
+      }
+      default:
+        break;
+      }
+      break;
+    }
+    default:
+      break;
     }
   }
 
   return RET_OK;
 }
 
-
 #include <sys/prctl.h>
-#include <unistd.h>
 #include <sys/syscall.h>
+#include <unistd.h>
 
 struct __tk_thread_t {
-  void* args;
+  void *args;
   bool_t running;
 };
 
-void exit_mouse_thread(tk_thread_t* thread) {
-  struct __tk_thread_t *p = (struct __tk_thread_t*) thread;
-  if(p->running) {
+void exit_mouse_thread(tk_thread_t *thread) {
+  struct __tk_thread_t *p = (struct __tk_thread_t *)thread;
+  if (p->running) {
     run_info_t *info = p->args;
     info->enable = FALSE;
   }
 }
 
-void* input_run(void* ctx) {
-  run_info_t *info = (run_info_t*)ctx;
+void *input_run(void *ctx) {
+  run_info_t *info = (run_info_t *)ctx;
 
   prctl(PR_SET_NAME, "mouseThread");
 
   if (info->fd < 0) {
-    log_debug("%s:%d: open mouse failed, fd=%d, filename=%s\n", __func__, __LINE__, info->fd,
-              info->filename);
+    log_debug("%s:%d: open mouse failed, fd=%d, filename=%s\n", __func__,
+              __LINE__, info->fd, info->filename);
   } else {
-    log_debug("%s:%d: open mouse successful, fd=%d, filename=%s\n", __func__, __LINE__, info->fd,
-              info->filename);
+    log_debug("%s:%d: open mouse successful, fd=%d, filename=%s\n", __func__,
+              __LINE__, info->fd, info->filename);
   }
 
-  while (input_dispatch_one_event(info) == RET_OK && info->enable);
+  while (input_dispatch_one_event(info) == RET_OK && info->enable)
+    ;
 
   close(info->fd);
   TKMEM_FREE(info->filename);
@@ -314,18 +320,18 @@ void* input_run(void* ctx) {
   return NULL;
 }
 
-static run_info_t* info_dup(run_info_t* info) {
-  run_info_t* new_info = TKMEM_ZALLOC(run_info_t);
+static run_info_t *info_dup(run_info_t *info) {
+  run_info_t *new_info = TKMEM_ZALLOC(run_info_t);
 
   *new_info = *info;
 
   return new_info;
 }
 
-tk_thread_t* mouse_thread_run(const char* filename, input_dispatch_t dispatch, void* ctx,
-                              int32_t max_x, int32_t max_y) {
+tk_thread_t *mouse_thread_run(const char *filename, input_dispatch_t dispatch,
+                              void *ctx, int32_t max_x, int32_t max_y) {
   run_info_t info;
-  tk_thread_t* thread = NULL;
+  tk_thread_t *thread = NULL;
   return_value_if_fail(filename != NULL && dispatch != NULL, NULL);
 
   memset(&info, 0x00, sizeof(info));

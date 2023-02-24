@@ -26,7 +26,7 @@
 
 BEGIN_C_DECLS
 
-lcd_t* lcd_linux_fb_create(const char* filename);
+lcd_t *lcd_linux_fb_create(const char *filename);
 
 END_C_DECLS
 

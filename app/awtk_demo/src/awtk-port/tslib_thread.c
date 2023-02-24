@@ -19,22 +19,22 @@
  *
  */
 
+#include "tslib_thread.h"
+#include "base/keys.h"
+#include "tkc/mem.h"
+#include "tkc/thread.h"
+#include "tkc/utils.h"
+#include "tslib.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "tslib.h"
-#include "tkc/mem.h"
-#include "base/keys.h"
-#include "tkc/thread.h"
-#include "tslib_thread.h"
-#include "tkc/utils.h"
 
 typedef struct _run_info_t {
   int32_t max_x;
   int32_t max_y;
-  struct tsdev* ts;
-  void* dispatch_ctx;
-  char* filename;
+  struct tsdev *ts;
+  void *dispatch_ctx;
+  char *filename;
   input_dispatch_t dispatch;
 
   event_queue_req_t req;
@@ -42,14 +42,14 @@ typedef struct _run_info_t {
   bool_t enable;
 } run_info_t;
 
-static ret_t tslib_dispatch(run_info_t* info) {
+static ret_t tslib_dispatch(run_info_t *info) {
   ret_t ret = info->dispatch(info->dispatch_ctx, &(info->req), "tslib");
   info->req.event.type = EVT_NONE;
 
   return ret;
 }
 
-static ret_t tslib_dispatch_one_event(run_info_t* info) {
+static ret_t tslib_dispatch_one_event(run_info_t *info) {
   struct ts_sample e = {0};
   int ret = -1;
 
@@ -57,11 +57,11 @@ static ret_t tslib_dispatch_one_event(run_info_t* info) {
     ret = ts_read(info->ts, &e, 1);
   }
 
-  if(!info->enable) {
+  if (!info->enable) {
     return RET_OK;
   }
 
-  event_queue_req_t* req = &(info->req);
+  event_queue_req_t *req = &(info->req);
 
   if (ret == 0) {
     return RET_OK;
@@ -77,11 +77,12 @@ static ret_t tslib_dispatch_one_event(run_info_t* info) {
       ts_config(info->ts);
 
       if (info->ts == NULL) {
-        log_debug("%s:%d: open tslib failed, filename=%s\n", __func__, __LINE__, info->filename);
-        //perror("print tslib: ");
-      } else {
-        log_debug("%s:%d: open tslib successful, filename=%s\n", __func__, __LINE__,
+        log_debug("%s:%d: open tslib failed, filename=%s\n", __func__, __LINE__,
                   info->filename);
+        // perror("print tslib: ");
+      } else {
+        log_debug("%s:%d: open tslib successful, filename=%s\n", __func__,
+                  __LINE__, info->filename);
       }
     }
 
@@ -92,8 +93,8 @@ static ret_t tslib_dispatch_one_event(run_info_t* info) {
   req->pointer_event.x = e.x;
   req->pointer_event.y = e.y;
 
-  log_debug("%s%d: e.pressure=%d x=%d y=%d ret=%d\n", __func__, __LINE__, e.pressure, e.x, e.y,
-            ret);
+  log_debug("%s%d: e.pressure=%d x=%d y=%d ret=%d\n", __func__, __LINE__,
+            e.pressure, e.x, e.y, ret);
 
   if (e.pressure > 0) {
     if (req->pointer_event.pressed) {
@@ -112,35 +113,38 @@ static ret_t tslib_dispatch_one_event(run_info_t* info) {
   return tslib_dispatch(info);
 }
 #include <sys/prctl.h>
-#include <unistd.h>
 #include <sys/syscall.h>
+#include <unistd.h>
 
 struct __tk_thread_t {
-  void* args;
+  void *args;
   bool_t running;
 };
 
-void exit_tslib_thread(tk_thread_t* thread) {
-  struct __tk_thread_t *p = (struct __tk_thread_t*) thread;
-  if(p->running) {
+void exit_tslib_thread(tk_thread_t *thread) {
+  struct __tk_thread_t *p = (struct __tk_thread_t *)thread;
+  if (p->running) {
     run_info_t *info = p->args;
     info->enable = FALSE;
   }
 }
 
-void* tslib_run(void* ctx) {
-  run_info_t *info = (run_info_t*) ctx;
+void *tslib_run(void *ctx) {
+  run_info_t *info = (run_info_t *)ctx;
 
   prctl(PR_SET_NAME, "tslibThread");
 
   if (info->ts == NULL) {
-    log_debug("%s:%d: open tslib failed, filename=%s\n", __func__, __LINE__, info->filename);
+    log_debug("%s:%d: open tslib failed, filename=%s\n", __func__, __LINE__,
+              info->filename);
   } else {
-    log_debug("%s:%d: open tslib successful, filename=%s\n", __func__, __LINE__, info->filename);
+    log_debug("%s:%d: open tslib successful, filename=%s\n", __func__, __LINE__,
+              info->filename);
   }
 
-  while (tslib_dispatch_one_event(info) == RET_OK && info->enable);
-  
+  while (tslib_dispatch_one_event(info) == RET_OK && info->enable)
+    ;
+
   ts_close(info->ts);
   TKMEM_FREE(info->filename);
   TKMEM_FREE(info);
@@ -148,18 +152,18 @@ void* tslib_run(void* ctx) {
   return NULL;
 }
 
-static run_info_t* info_dup(run_info_t* info) {
-  run_info_t* new_info = TKMEM_ZALLOC(run_info_t);
+static run_info_t *info_dup(run_info_t *info) {
+  run_info_t *new_info = TKMEM_ZALLOC(run_info_t);
 
   *new_info = *info;
 
   return new_info;
 }
 
-tk_thread_t* tslib_thread_run(const char* filename, input_dispatch_t dispatch, void* ctx,
-                              int32_t max_x, int32_t max_y) {
+tk_thread_t *tslib_thread_run(const char *filename, input_dispatch_t dispatch,
+                              void *ctx, int32_t max_x, int32_t max_y) {
   run_info_t info;
-  tk_thread_t* thread = NULL;
+  tk_thread_t *thread = NULL;
   return_value_if_fail(filename != NULL && dispatch != NULL, NULL);
 
   memset(&info, 0x00, sizeof(info));

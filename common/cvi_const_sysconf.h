@@ -7,20 +7,21 @@
  *
  * Copyright (C) Cvitek Co., Ltd. 2019-2020. All rights reserved.
  *
- * Description: 
+ * Description:
  *
  * History			:
- * =====================================================================================
+ *
+ =====================================================================================
    1.Date 			:	2020/07/16
    Author 			:	garry.xin
    Modification		:	Created file
- * ====================================================================================*/
+ *
+ ====================================================================================*/
 #ifndef _CVI_CONST_SYSCONF_H_
 #define _CVI_CONST_SYSCONF_H_
 
-
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 ///////////////////////////////////////////////////////////////////////////
 ///   SYSTEM DEFINE
@@ -46,9 +47,10 @@
 
 #define CVI_DEV_PROFILE_NUM 2
 
-#define CVIBSV_USE_SENDCMD_REPLACE_POSTCMD  1 // use send command to archive sync call functions
+#define CVIBSV_USE_SENDCMD_REPLACE_POSTCMD                                     \
+  1 // use send command to archive sync call functions
 
 #ifdef __cplusplus
-	}
+}
 #endif
-#endif//_CVI_CONST_SYSCONF_H_
+#endif //_CVI_CONST_SYSCONF_H_

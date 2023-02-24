@@ -23,7 +23,8 @@ typedef enum { COS_SIMILARITY } cvai_service_feature_matching_e;
  *  @brief Feature array structure used in Service
  *
  * @var cvai_service_feature_array_t::ptr
- * ptr is the raw 1-D array of the feature array. Format is feature 1, feature 2...
+ * ptr is the raw 1-D array of the feature array. Format is feature 1,
+ * feature 2...
  * @var cvai_service_feature_array_t::feature_length
  * feature length is the length of one single feature.
  * @var cvai_service_feature_array_t::data_num
@@ -32,7 +33,7 @@ typedef enum { COS_SIMILARITY } cvai_service_feature_matching_e;
  * type is the data type of the feature array.
  */
 typedef struct {
-  int8_t* ptr;
+  int8_t *ptr;
   uint32_t feature_length;
   uint32_t data_num;
   feature_type_e type;
@@ -52,4 +53,4 @@ typedef enum {
   OUTSIDE_POLYGON
 } cvai_area_detect_e;
 
-#endif  // End of _CVIAI_SERVICE_TYPES_H_
+#endif // End of _CVIAI_SERVICE_TYPES_H_

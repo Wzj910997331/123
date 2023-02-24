@@ -8,12 +8,12 @@ extern "C" {
 #endif
 #endif
 
-//mw header
-#include "cvi_type.h"
-#include "cvi_defines.h"
+// mw header
 #include "cvi_comm_vo.h"
+#include "cvi_defines.h"
+#include "cvi_type.h"
 
-//awtk header
+// awtk header
 #include "awtk.h"
 
 CVI_S32 CVIAPP_Init(void);
@@ -30,4 +30,3 @@ void CVIAPP_GetVoSize(uint32_t *w, uint32_t *h);
 #endif
 
 #endif
-

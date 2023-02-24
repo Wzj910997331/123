@@ -15,23 +15,23 @@ extern "C" {
 /**@{*/
 
 /**
- * @brief Do quantize scale for a given VIDEO_FRAME_INFO_S, but the quantized_factor and
- *        quantized_mean have to calculate manually.
+ * @brief Do quantize scale for a given VIDEO_FRAME_INFO_S, but the
+ * quantized_factor and quantized_mean have to calculate manually.
  *
  * @param handle An AI SDK handle.
  * @param frame Input frame.
  * @param output Output frame.
  * @param quantized_factor Quantized factor.
  * @param quantized_mean Quantized mean, must be positive.
- * @param thread Working thread id of vpss thread. A new thread will be created if thread doesn't
- * exist.
+ * @param thread Working thread id of vpss thread. A new thread will be created
+ * if thread doesn't exist.
  * @param timeout Vpss wait timeout value.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_SQPreprocessRaw(cviai_handle_t handle, const VIDEO_FRAME_INFO_S *frame,
-                                          VIDEO_FRAME_INFO_S *output, const float quantized_factor,
-                                          const float quantized_mean, const uint32_t thread,
-                                          uint32_t timeout);
+DLL_EXPORT CVI_S32 CVI_AI_SQPreprocessRaw(
+    cviai_handle_t handle, const VIDEO_FRAME_INFO_S *frame,
+    VIDEO_FRAME_INFO_S *output, const float quantized_factor,
+    const float quantized_mean, const uint32_t thread, uint32_t timeout);
 
 /**
  * @brief Do Quantize scale for a given VIDEO_FRAME_INFO_S.
@@ -43,14 +43,16 @@ DLL_EXPORT CVI_S32 CVI_AI_SQPreprocessRaw(cviai_handle_t handle, const VIDEO_FRA
  * @param factor Factor.
  * @param mean Mean.
  * @param quantize_threshold Threshold for quantization.
- * @param thread Working thread id of vpss thread. A new thread will be created if thread doesn't
- * exist.
+ * @param thread Working thread id of vpss thread. A new thread will be created
+ * if thread doesn't exist.
  * @param timeout Vpss wait timeout value.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_SQPreprocess(cviai_handle_t handle, const VIDEO_FRAME_INFO_S *frame,
-                                       VIDEO_FRAME_INFO_S *output, const float factor,
-                                       const float mean, const float quantize_threshold,
+DLL_EXPORT CVI_S32 CVI_AI_SQPreprocess(cviai_handle_t handle,
+                                       const VIDEO_FRAME_INFO_S *frame,
+                                       VIDEO_FRAME_INFO_S *output,
+                                       const float factor, const float mean,
+                                       const float quantize_threshold,
                                        const uint32_t thread, uint32_t timeout);
 
 /**
@@ -63,7 +65,8 @@ DLL_EXPORT CVI_S32 CVI_AI_SQPreprocess(cviai_handle_t handle, const VIDEO_FRAME_
  * @return int Return CVI_SUCCESS on success.
  */
 DLL_EXPORT CVI_S32 CVI_AI_Dequantize(const int8_t *quantizedData, float *data,
-                                     const uint32_t bufferSize, const float dequantizeThreshold);
+                                     const uint32_t bufferSize,
+                                     const float dequantizeThreshold);
 
 /**
  * @brief Do softmax on buffer.
@@ -82,7 +85,8 @@ DLL_EXPORT CVI_S32 CVI_AI_SoftMax(const float *inputBuffer, float *outputBuffer,
  * @param face Input cvai_face_t.
  * @param faceNMS Output result.
  * @param threshold NMS threshold.
- * @param method Support 'u' and 'm'. (intersection over union and intersection over min area)
+ * @param method Support 'u' and 'm'. (intersection over union and intersection
+ * over min area)
  * @return int Return CVI_SUCCESS on success.
  */
 DLL_EXPORT CVI_S32 CVI_AI_FaceNMS(const cvai_face_t *face, cvai_face_t *faceNMS,
@@ -94,10 +98,12 @@ DLL_EXPORT CVI_S32 CVI_AI_FaceNMS(const cvai_face_t *face, cvai_face_t *faceNMS,
  * @param obj Input cvai_object_t.
  * @param objNMS Output result.
  * @param threshold NMS threshold.
- * @param method Support 'u' and 'm'. (intersection over union and intersection over min area)
+ * @param method Support 'u' and 'm'. (intersection over union and intersection
+ * over min area)
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_ObjectNMS(const cvai_object_t *obj, cvai_object_t *objNMS,
+DLL_EXPORT CVI_S32 CVI_AI_ObjectNMS(const cvai_object_t *obj,
+                                    cvai_object_t *objNMS,
                                     const float threshold, const char method);
 
 /**
@@ -111,9 +117,12 @@ DLL_EXPORT CVI_S32 CVI_AI_ObjectNMS(const cvai_object_t *obj, cvai_object_t *obj
  * @param enableGDC Enable GDC hardware support.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_FaceAlignment(VIDEO_FRAME_INFO_S *inFrame, const uint32_t metaWidth,
-                                        const uint32_t metaHeight, const cvai_face_info_t *info,
-                                        VIDEO_FRAME_INFO_S *outFrame, const bool enableGDC);
+DLL_EXPORT CVI_S32 CVI_AI_FaceAlignment(VIDEO_FRAME_INFO_S *inFrame,
+                                        const uint32_t metaWidth,
+                                        const uint32_t metaHeight,
+                                        const cvai_face_info_t *info,
+                                        VIDEO_FRAME_INFO_S *outFrame,
+                                        const bool enableGDC);
 
 /**@}*/
 
@@ -121,4 +130,4 @@ DLL_EXPORT CVI_S32 CVI_AI_FaceAlignment(VIDEO_FRAME_INFO_S *inFrame, const uint3
 }
 #endif
 
-#endif  // End of _CVIAI_UTILS_H_
+#endif // End of _CVIAI_UTILS_H_

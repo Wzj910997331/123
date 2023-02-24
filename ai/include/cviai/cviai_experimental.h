@@ -20,4 +20,4 @@ DLL_EXPORT void CVI_AI_EnableGDC(cviai_handle_t handle, bool use_gdc);
 }
 #endif
 
-#endif  // End of _CVIAI_EXPERIMENTAL_H_
+#endif // End of _CVIAI_EXPERIMENTAL_H_

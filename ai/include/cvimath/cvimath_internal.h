@@ -1,9 +1,9 @@
 #ifndef CVIMATH_INTERNAL_H
 #define CVIMATH_INTERNAL_H
 
-#include <stdbool.h>  //bool
-#include <stddef.h>   //size_t
 #include "cvimath.h"
+#include <stdbool.h> //bool
+#include <stddef.h>  //size_t
 
 // copy from lagency
 // TODO: move to properly header files
@@ -17,7 +17,9 @@ typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
 
-static inline uint64_t align_up(uint64_t x, uint64_t n) { return (x + n - 1) / n * n; }
+static inline uint64_t align_up(uint64_t x, uint64_t n) {
+  return (x + n - 1) / n * n;
+}
 
 /**
  * please refer @example for more details
@@ -63,7 +65,8 @@ void cvm_sqrt_tbl(uint16_t *sqrt_table_data, uint16_t *sqrt_table_data_mantissa,
  * @param [out] table_mantissa bf16 fraction part lookup table in host
  * @param table_shape table shape
  */
-void cvm_gen_sqrt_mantissa(uint16_t *table_mantissa, cvk_tl_shape_t *table_shape);
+void cvm_gen_sqrt_mantissa(uint16_t *table_mantissa,
+                           cvk_tl_shape_t *table_shape);
 
 /**
  * @brief implement sqrt in tpu memory
@@ -72,7 +75,8 @@ void cvm_gen_sqrt_mantissa(uint16_t *table_mantissa, cvk_tl_shape_t *table_shape
  * @param tl_ifmap input tensor in tpu memory
  * @param tl_buf working buffer
  * @param tbl_answer lookup table tensor for bf16 exponent part in tpu memory
- * @param tbl_answer_mantissa lookup table tensor for fraction part in tpu memory
+ * @param tbl_answer_mantissa lookup table tensor for fraction part in tpu
+ * memory
  * @param [out] tl_ofmap_bf16 result in in memory
  *
  * @example
@@ -81,19 +85,20 @@ void cvm_gen_sqrt_mantissa(uint16_t *table_mantissa, cvk_tl_shape_t *table_shape
  *  cvm_sqrt_tbl(table_data, table_data_mantissa, &table_shape);
  *  // 3. put host data to tpu memory
  *  // 4. prepare command buffer
- *  cvm_emit_sqrt(cvk_ctx, tl_ifmap, tl_buf, cvk_tl_table_answer, cvk_tl_table_answer_mantissa,
- *                tl_ofmap_bf16);
+ *  cvm_emit_sqrt(cvk_ctx, tl_ifmap, tl_buf, cvk_tl_table_answer,
+ * cvk_tl_table_answer_mantissa, tl_ofmap_bf16);
  *  // 5. submit it
  *  test_submit_comp(rt_ctx, cvk_ctx);
  *
  *  // 6. get result from tpu memory
- *  uint16_t* result = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx, tl_ofmap_bf16,
- * tl_ofmap_bf16->fmt);
+ *  uint16_t* result = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx,
+ * tl_ofmap_bf16, tl_ofmap_bf16->fmt);
  *
  * @return status, 0 means success, other means generates command fail
  */
 int cvm_emit_sqrt(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf,
-                  cvk_tl_t *tbl_answer, cvk_tl_t *tbl_answer_mantissa, cvk_tl_t *tl_ofmap_bf16);
+                  cvk_tl_t *tbl_answer, cvk_tl_t *tbl_answer_mantissa,
+                  cvk_tl_t *tl_ofmap_bf16);
 
 /**
  * @brief generate reciprocal look up table for bf16 exponent part
@@ -109,7 +114,8 @@ void cvm_gen_reciprocal(uint16_t *table_data, cvk_tl_shape_t *table_shape);
  * @param [out] table_mantissa bf16 fraction part lookup table in host
  * @param table_shape table shape
  */
-void cvm_gen_reciprocal_mantissa(uint16_t *table_mantissa, cvk_tl_shape_t *table_shape);
+void cvm_gen_reciprocal_mantissa(uint16_t *table_mantissa,
+                                 cvk_tl_shape_t *table_shape);
 
 /**
  * @brief syntactic sugar for cvm_gen_reciprocal/cvm_gen_reciprocal_mantissa
@@ -128,7 +134,8 @@ void cvm_reciprocal_tbl(uint16_t *table_data, uint16_t *table_mantissa,
  * @param tl_ifmap input tensor in tpu memory
  * @param tl_buf working buffer
  * @param tbl_answer lookup table tensor for bf16 exponent part in tpu memory
- * @param tbl_answer_mantissa lookup table tensor for fraction part in tpu memory
+ * @param tbl_answer_mantissa lookup table tensor for fraction part in tpu
+ * memory
  * @param [out] tl_ofmap_bf16 result in in memory
  *
  * @example
@@ -145,19 +152,20 @@ void cvm_reciprocal_tbl(uint16_t *table_data, uint16_t *table_mantissa,
  *  test_submit_comp(rt_ctx, cvk_ctx);
  *
  *  // 6. get result from tpu memory
- *  uint16_t* result = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx, tl_ofmap_bf16,
- * tl_ofmap_bf16->fmt);
+ *  uint16_t* result = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx,
+ * tl_ofmap_bf16, tl_ofmap_bf16->fmt);
  *
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_emit_reciprocal(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf,
-                        cvk_tl_t *tbl_answer, cvk_tl_t *tbl_answer_mantissa,
-                        cvk_tl_t *tl_ofmap_bf16);
+int cvm_emit_reciprocal(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap,
+                        cvk_tl_t *tl_buf, cvk_tl_t *tbl_answer,
+                        cvk_tl_t *tbl_answer_mantissa, cvk_tl_t *tl_ofmap_bf16);
 
 /**
  * @brief generate sigmoid lookup table in host,
  * we leverage Linear interpolation fairly close to the original
- * you can refer [wiki](https://en.wikipedia.org/wiki/Interpolation) for more details
+ * you can refer [wiki](https://en.wikipedia.org/wiki/Interpolation) for more
+ * details
  *
  * @param [out] sigmoid_table_data lookup table in host
  * @param [out] sigmoid_table_data_slope slope table in host
@@ -167,8 +175,10 @@ int cvm_emit_reciprocal(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl
  * than -8 is our \range_start and 8 is \range_end
  * @param range_end quantize range end
  */
-void cvm_sigmoid_tbl(uint16_t *sigmoid_table_data, uint16_t *sigmoid_table_data_slope,
-                     cvk_tl_shape_t *table_shape, int range_start, int range_end);
+void cvm_sigmoid_tbl(uint16_t *sigmoid_table_data,
+                     uint16_t *sigmoid_table_data_slope,
+                     cvk_tl_shape_t *table_shape, int range_start,
+                     int range_end);
 
 /**
  * @brief get scale factor from \range_start and \range_end
@@ -186,32 +196,35 @@ float cvm_sigmoid_scale(int range_start, int range_end);
  * @param cvk_ctx kernel structure
  * @param tl_ifmap input tensor in tpu memory
  * @param tl_buf working buffer
- * @param tl_table_answer sigmoid table in tpu memory generated by \cvm_sigmoid_tbl
- * @param tl_table_answer_slope sigmoid slope table in tpu memory generated by \cvm_sigmoid_tbl
+ * @param tl_table_answer sigmoid table in tpu memory generated by
+ * \cvm_sigmoid_tbl
+ * @param tl_table_answer_slope sigmoid slope table in tpu memory generated by
+ * \cvm_sigmoid_tbl
  * @param [out] tl_ofmap_bf16 result in in memory
  * @param scale scale factor generated by \cvm_sigmoid_scale
  *
  * @example
  *  // 1. alloc in tpu memory
  *  // 2. prepare table
- *  cvm_sigmoid_tbl(table_data, table_data_slope, &table_shape, range_start, range_end);
- *  float scale = cvm_sigmoid_scale(range_start, range_end);
+ *  cvm_sigmoid_tbl(table_data, table_data_slope, &table_shape, range_start,
+ * range_end); float scale = cvm_sigmoid_scale(range_start, range_end);
  *  // 3. put host data to tpu memory
  *  // 4. prepare command buffer
- *  cvm_emit_sigmoid(cvk_ctx, tl_ifmap, tl_buf, cvk_tl_table_answer, cvk_tl_table_answer_slope,
- *                   tl_ofmap_bf16, scale);
+ *  cvm_emit_sigmoid(cvk_ctx, tl_ifmap, tl_buf, cvk_tl_table_answer,
+ * cvk_tl_table_answer_slope, tl_ofmap_bf16, scale);
  *  // 5. submit it
  *  test_submit_comp(rt_ctx, cvk_ctx);
  *
  *  // 6. get result from tpu memory
- *  uint16_t* result = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx, tl_ofmap_bf16,
- * tl_ofmap_bf16->fmt);
+ *  uint16_t* result = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx,
+ * tl_ofmap_bf16, tl_ofmap_bf16->fmt);
  *
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_emit_sigmoid(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf,
-                     cvk_tl_t *tl_table_answer, cvk_tl_t *tl_table_answer_slope,
-                     cvk_tl_t *tl_ofmap_bf16, float scale);
+int cvm_emit_sigmoid(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap,
+                     cvk_tl_t *tl_buf, cvk_tl_t *tl_table_answer,
+                     cvk_tl_t *tl_table_answer_slope, cvk_tl_t *tl_ofmap_bf16,
+                     float scale);
 
 /**
  * @brief General Matrix Multiplication
@@ -229,9 +242,10 @@ int cvm_emit_sigmoid(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_bu
  *
  * // 1. alloc host memory and put it to device memory
  * // M=in_row K=in_col N=out_col
- * cvk_mg_t *mg_A = _test_put_matrix_g(&ctx, M, K, CVK_FMT_BF16, (uint8_t *)bf16_A);
- * cvk_mg_t *mg_B = _test_put_matrix_g(&ctx, K, N, CVK_FMT_BF16, (uint8_t *)bf16_B);
- * cvk_mg_t *mg_R = _test_put_matrix_g(&ctx, M * 2, N, CVK_FMT_BF16, (uint8_t *)bf16_R);
+ * cvk_mg_t *mg_A = _test_put_matrix_g(&ctx, M, K, CVK_FMT_BF16, (uint8_t
+ * *)bf16_A); cvk_mg_t *mg_B = _test_put_matrix_g(&ctx, K, N, CVK_FMT_BF16,
+ * (uint8_t *)bf16_B); cvk_mg_t *mg_R = _test_put_matrix_g(&ctx, M * 2, N,
+ * CVK_FMT_BF16, (uint8_t *)bf16_R);
  *
  * // 2. get device address for gemm
  * gaddr_t gaddr_a = mg_A->start_address;
@@ -250,7 +264,8 @@ int cvm_emit_sigmoid(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_bu
  * @ return slice_num array of {M, N, K}
  */
 size_t *cvm_gemm(cvk_context_t *cvk_ctx, uint64_t lhs_gaddr, uint64_t rhs_gaddr,
-                 uint64_t dest_gaddr, int in_row, int in_col, int out_col, cvk_fmt_t fmt);
+                 uint64_t dest_gaddr, int in_row, int in_col, int out_col,
+                 cvk_fmt_t fmt);
 
 /**
  * @brief combine \cvm_gemm int8 result to int32
@@ -277,8 +292,8 @@ size_t *cvm_gemm(cvk_context_t *cvk_ctx, uint64_t lhs_gaddr, uint64_t rhs_gaddr,
  *
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_combin_gemm_i8(size_t *cvm_gemm_strategy, uint8_t *cvm_output, uint32_t *i32_R, int M,
-                       int N);
+int cvm_combin_gemm_i8(size_t *cvm_gemm_strategy, uint8_t *cvm_output,
+                       uint32_t *i32_R, int M, int N);
 /**
  * @brief fp32 to bf16 format int device memory
  *
@@ -305,8 +320,9 @@ int cvm_combin_gemm_i8(size_t *cvm_gemm_strategy, uint8_t *cvm_output, uint32_t 
  *
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_s2s_fp32_bf16(cvk_context_t *cvk_ctx, uint64_t gaddr_fp32, cvk_tg_shape_t fp32_shape,
-                      uint64_t gaddr_bf16, cvk_tg_shape_t bf16_shape, cvk_fmt_t fmt);
+int cvm_s2s_fp32_bf16(cvk_context_t *cvk_ctx, uint64_t gaddr_fp32,
+                      cvk_tg_shape_t fp32_shape, uint64_t gaddr_bf16,
+                      cvk_tg_shape_t bf16_shape, cvk_fmt_t fmt);
 
 /**
  * @brief generate lookup table for check input is 0 or not
@@ -325,14 +341,16 @@ void cvm_gen_0_tbl(uint16_t *table_0, cvk_tl_shape_t *table_shape);
  * @param cvk_ctx kernel structure
  * @param tl_ifmap input in tpu memory
  * @param tl_buf working buffer
- * @param tbl_answer lookup table for 0 or not in tpu memory, generate by \cvm_gen_0_tbl
+ * @param tbl_answer lookup table for 0 or not in tpu memory, generate by
+ * \cvm_gen_0_tbl
  * @param [out] tl_ofmap_bf16 mask result in tpu memory
  * @param fmt tensor format such as \CVK_FMT_BF16
  *
  * @return status, 0 means success, other means generates command fail
  */
 int cvm_emit_0_idx(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf,
-                   cvk_tl_t *tbl_answer, cvk_tl_t *tl_ofmap_bf16, cvk_fmt_t fmt);
+                   cvk_tl_t *tbl_answer, cvk_tl_t *tl_ofmap_bf16,
+                   cvk_fmt_t fmt);
 
 /**
  * @brief get mask value that check < 0
@@ -348,8 +366,9 @@ int cvm_emit_0_idx(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf,
  *
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_emit_neg_idx(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf,
-                     cvk_tl_t *tl_pos_neg_buf, cvk_tl_t *tl_ofmap_bf16, cvk_fmt_t fmt);
+int cvm_emit_neg_idx(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap,
+                     cvk_tl_t *tl_buf, cvk_tl_t *tl_pos_neg_buf,
+                     cvk_tl_t *tl_ofmap_bf16, cvk_fmt_t fmt);
 
 /**
  * @brief get mask value that check >= 0
@@ -365,8 +384,9 @@ int cvm_emit_neg_idx(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_bu
  *
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_emit_pos_idx(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf,
-                     cvk_tl_t *tl_pos_neg_buf, cvk_tl_t *tl_ofmap_bf16, cvk_fmt_t fmt);
+int cvm_emit_pos_idx(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap,
+                     cvk_tl_t *tl_buf, cvk_tl_t *tl_pos_neg_buf,
+                     cvk_tl_t *tl_ofmap_bf16, cvk_fmt_t fmt);
 
 /**
  * @brief invert 0/1 input
@@ -380,16 +400,17 @@ int cvm_emit_pos_idx(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_bu
  *
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_emit_0_1_revert_input(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf,
-                              cvk_tl_t *tl_ofmap_bf16, cvk_fmt_t fmt);
+int cvm_emit_0_1_revert_input(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap,
+                              cvk_tl_t *tl_buf, cvk_tl_t *tl_ofmap_bf16,
+                              cvk_fmt_t fmt);
 
 // mask enum define
 enum CVM_MASK_TYPE {
-  CVM_MASK_TYPE_GT_0 = 0,  // remain >  0
-  CVM_MASK_TYPE_GE_0,      // remain >= 0
-  CVM_MASK_TYPE_EQ_0,      // remain  = 0
-  CVM_MASK_TYPE_LT_0,      // remain <  0
-  CVM_MASK_TYPE_LE_0,      // remain <= 0
+  CVM_MASK_TYPE_GT_0 = 0, // remain >  0
+  CVM_MASK_TYPE_GE_0,     // remain >= 0
+  CVM_MASK_TYPE_EQ_0,     // remain  = 0
+  CVM_MASK_TYPE_LT_0,     // remain <  0
+  CVM_MASK_TYPE_LE_0,     // remain <= 0
   CVM_MASK_MAX
 };
 
@@ -402,7 +423,8 @@ enum CVM_MASK_TYPE {
  * @param tl_buf2 working buffer
  * @param tl_buf3 working buffer
  * @param tl_pos_neg_table lookup table generate from \cvm_pos_neg_tbl
- * @param tl_0_idx_table lookup table for 0 or not in tpu memory generated by \cvm_gen_0_tbl
+ * @param tl_0_idx_table lookup table for 0 or not in tpu memory generated by
+ * \cvm_gen_0_tbl
  * @param [out] tl_ofmap_bf16 mask result in tpu memory
  * @param fmt tensor format such as \CVK_FMT_BF16
  * @param mask \CVM_MASK_TYPE
@@ -425,15 +447,17 @@ enum CVM_MASK_TYPE {
  *  test_submit_comp(rt_ctx, cvk_ctx);
  *
  *  // 6. get result from tpu memory
- *  uint16_t* result = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx, tl_ofmap_bf16,
- * tl_ofmap_bf16->fmt);
+ *  uint16_t* result = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx,
+ * tl_ofmap_bf16, tl_ofmap_bf16->fmt);
  *
  *
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_emit_mask(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf, cvk_tl_t *tl_buf2,
-                  cvk_tl_t *tl_buf3, cvk_tl_t *tl_pos_neg_table, cvk_tl_t *tl_0_idx_table,
-                  cvk_tl_t *tl_ofmap_bf16, cvk_fmt_t fmt, enum CVM_MASK_TYPE mask);
+int cvm_emit_mask(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf,
+                  cvk_tl_t *tl_buf2, cvk_tl_t *tl_buf3,
+                  cvk_tl_t *tl_pos_neg_table, cvk_tl_t *tl_0_idx_table,
+                  cvk_tl_t *tl_ofmap_bf16, cvk_fmt_t fmt,
+                  enum CVM_MASK_TYPE mask);
 
 /**
  * @brief generate lookup table for atan by degree
@@ -441,7 +465,8 @@ int cvm_emit_mask(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf, 
  * @param [out] table_data_y0 atan by degree lookup table in host
  * @param table_shape table shape
  */
-void cvm_atan_fast_degree_y0(uint16_t *table_data_y0, cvk_tl_shape_t *table_shape);
+void cvm_atan_fast_degree_y0(uint16_t *table_data_y0,
+                             cvk_tl_shape_t *table_shape);
 
 /**
  * @brief generate lookup table for check value of absolute in [0,1] or > 1
@@ -454,7 +479,8 @@ void cvm_atan_s_01(uint16_t *table_invert, cvk_tl_shape_t *table_shape);
 
 /**
  * @brief generate table for check input value is positive(>=0) or negtive(<0)
- * by lookup table, 'pos_neg' means data is positive(>=0) is 1 or negtive(<0) is -1
+ * by lookup table, 'pos_neg' means data is positive(>=0) is 1 or negtive(<0) is
+ * -1
  *
  * @param [out] table_pos_neg lookup table in host
  * @param table_shape table shape
@@ -466,7 +492,8 @@ void cvm_atan_pos_neg(uint16_t *table_pos_neg, cvk_tl_shape_t *table_shape);
 
 /**
  * @brief generate atan answer by lookup table,
- * plz refer [git](https://github.com/xiezhq-hermann/atan_lookup) for more details
+ * plz refer [git](https://github.com/xiezhq-hermann/atan_lookup) for more
+ * details
  *
  * @param [out] table_data_y0 atan answer lookup table in host
  * @param table_shape table shape
@@ -482,7 +509,8 @@ void cvm_atan_y0(uint16_t *table_data_y0, cvk_tl_shape_t *table_shape);
 void cvm_atan_slope(uint16_t *table_slope, cvk_tl_shape_t *table_shape);
 
 /**
- * @brief syntactic sugar for cvm_atan_y0/cvm_atan_slope/cvm_atan_s_01/cvm_pos_neg_tbl
+ * @brief syntactic sugar for
+ * cvm_atan_y0/cvm_atan_slope/cvm_atan_s_01/cvm_pos_neg_tbl
  *
  * @param [out] table_data_atan_y0 atan answer lookup table in host
  * @param [out] table_data_atan_slope atan slope lookup table in host
@@ -491,7 +519,8 @@ void cvm_atan_slope(uint16_t *table_slope, cvk_tl_shape_t *table_shape);
  * @param table_shape table shape
  */
 void cvm_atan_tbl(uint16_t *table_data_atan_y0, uint16_t *table_data_atan_slope,
-                  uint16_t *table_data_atan_invert, uint16_t *table_data_atan_pos_neg,
+                  uint16_t *table_data_atan_invert,
+                  uint16_t *table_data_atan_pos_neg,
                   cvk_tl_shape_t *table_shape);
 
 /**
@@ -507,17 +536,19 @@ void cvm_atan_tbl(uint16_t *table_data_atan_y0, uint16_t *table_data_atan_slope,
  * @param tl_invert_buf lookup table in tpu memory
  * @param tl_pos_neg_buf lookup table in memory
  * @param tl_table_answer reciprocal for bf16 exponent part in tpu memory
- * @param tl_table_answer_mantissa reciprocal for bf16 fraction part in tpu memory
+ * @param tl_table_answer_mantissa reciprocal for bf16 fraction part in tpu
+ * memory
  * @param [out] tl_ofmap_bf16 result in tpu memory
  * @param fmt tensor format such as \CVK_FMT_BF16
  *
  * @example
  * // 1. alloc in tpu memory
  * // 2.1. get reciprocal table in host
- * cvm_reciprocal_tbl(table_reciprocal_data, table_reciprocal_data_mantissa, &table_shape);
+ * cvm_reciprocal_tbl(table_reciprocal_data, table_reciprocal_data_mantissa,
+ * &table_shape);
  * // 2.2. get atan table in host
- * cvm_atan_tbl(table_data_atan_y0, table_data_atan_slope, table_data_atan_invert,
- *              table_data_atan_pos_neg, &table_shape);
+ * cvm_atan_tbl(table_data_atan_y0, table_data_atan_slope,
+ * table_data_atan_invert, table_data_atan_pos_neg, &table_shape);
  * // 3. put host data to tpu memory
  * // 4. prepare command buffer
  * cvm_atan_emit(cvk_ctx, tl_ifmap, tl_buf, tl_buf2, tl_buf4, tl_y0_buf,
@@ -527,14 +558,16 @@ void cvm_atan_tbl(uint16_t *table_data_atan_y0, uint16_t *table_data_atan_slope,
  * // 5. submit it
  * test_submit_comp(rt_ctx, cvk_ctx);
  * // 6. get result from tpu memory
- * uint16_t *ofmap_data = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx, tl_ofmap_bf16,
- * tl_ofmap_bf16->fmt);
+ * uint16_t *ofmap_data = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx,
+ * tl_ofmap_bf16, tl_ofmap_bf16->fmt);
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_atan_emit(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf, cvk_tl_t *tl_buf2,
-                  cvk_tl_t *tl_buf3, cvk_tl_t *tl_y0_buf, cvk_tl_t *tl_slope_buf,
-                  cvk_tl_t *tl_invert_buf, cvk_tl_t *tl_pos_neg_buf, cvk_tl_t *tl_table_answer,
-                  cvk_tl_t *tl_table_answer_mantissa, cvk_tl_t *tl_ofmap_bf16, cvk_fmt_t fmt);
+int cvm_atan_emit(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf,
+                  cvk_tl_t *tl_buf2, cvk_tl_t *tl_buf3, cvk_tl_t *tl_y0_buf,
+                  cvk_tl_t *tl_slope_buf, cvk_tl_t *tl_invert_buf,
+                  cvk_tl_t *tl_pos_neg_buf, cvk_tl_t *tl_table_answer,
+                  cvk_tl_t *tl_table_answer_mantissa, cvk_tl_t *tl_ofmap_bf16,
+                  cvk_fmt_t fmt);
 // atan2 function
 /**
  * @brief syntactic sugar for generate atan in degree lookup table in
@@ -545,12 +578,14 @@ int cvm_atan_emit(cvk_context_t *cvk_ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf, 
  * @param [out] table_data_atan_pos_neg lookup table in host
  * @param table_shape table shape
  */
-void cvm_atan_fast_degree_tbl(uint16_t *table_data_atan_y0, uint16_t *table_data_atan_invert,
-                              uint16_t *table_data_atan_pos_neg, cvk_tl_shape_t *table_shape);
+void cvm_atan_fast_degree_tbl(uint16_t *table_data_atan_y0,
+                              uint16_t *table_data_atan_invert,
+                              uint16_t *table_data_atan_pos_neg,
+                              cvk_tl_shape_t *table_shape);
 
 /**
- * @brief implement atan2 by degree in tpu memory, implemented by atan. you can refer
- * [wiki](https://en.wikipedia.org/wiki/Atan2) for more details
+ * @brief implement atan2 by degree in tpu memory, implemented by atan. you can
+ * refer [wiki](https://en.wikipedia.org/wiki/Atan2) for more details
  *
  * @param cvk_ctx kernel structure
  * @param y input tensor in tpu memory
@@ -562,17 +597,19 @@ void cvm_atan_fast_degree_tbl(uint16_t *table_data_atan_y0, uint16_t *table_data
  * @param tl_invert_buf lookup table in tpu memory
  * @param tl_pos_neg_buf lookup table in memory
  * @param tl_table_answer reciprocal for bf16 exponent part in tpu memory
- * @param tl_table_answer_mantissa reciprocal for bf16 fraction part in tpu memory
+ * @param tl_table_answer_mantissa reciprocal for bf16 fraction part in tpu
+ * memory
  * @param [out] tl_ofmap_bf16 result in tpu memory
  * @param fmt tensor format such as \CVK_FMT_BF16
  *
  * @example
  * // 1. alloc in tpu memory
  * // 2.1. get reciprocal table in host
- * cvm_reciprocal_tbl(table_reciprocal_data, table_reciprocal_data_mantissa, &table_shape);
+ * cvm_reciprocal_tbl(table_reciprocal_data, table_reciprocal_data_mantissa,
+ * &table_shape);
  * // 2.2. get atan table in host
- * cvm_atan_fast_degree_tbl(table_data_atan_y0, table_data_atan_slope, table_data_atan_invert,
- *              table_data_atan_pos_neg, &table_shape);
+ * cvm_atan_fast_degree_tbl(table_data_atan_y0, table_data_atan_slope,
+ * table_data_atan_invert, table_data_atan_pos_neg, &table_shape);
  * // 3. put host data to tpu memory
  * // 4. prepare command buffer
  * cvm_atan2_fast_degree_emit(
@@ -583,13 +620,16 @@ void cvm_atan_fast_degree_tbl(uint16_t *table_data_atan_y0, uint16_t *table_data
  * // 5. submit it
  * test_submit_comp(rt_ctx, cvk_ctx);
  * // 6. get result from tpu memory
- * uint16_t *ofmap_data = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx, tl_ofmap_bf16,
- * tl_ofmap_bf16->fmt);
+ * uint16_t *ofmap_data = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx,
+ * tl_ofmap_bf16, tl_ofmap_bf16->fmt);
  */
-void cvm_atan2_fast_degree_emit(cvk_context_t *cvk_ctx, cvk_tl_t *y, cvk_tl_t *x, cvk_tl_t *tl_buf,
-                                cvk_tl_t *tl_buf2, cvk_tl_t *tl_buf3, cvk_tl_t *tl_y0_buf,
-                                cvk_tl_t *tl_invert_buf, cvk_tl_t *tl_pos_neg_buf,
-                                cvk_tl_t *tl_table_answer, cvk_tl_t *tl_table_answer_mantissa,
+void cvm_atan2_fast_degree_emit(cvk_context_t *cvk_ctx, cvk_tl_t *y,
+                                cvk_tl_t *x, cvk_tl_t *tl_buf,
+                                cvk_tl_t *tl_buf2, cvk_tl_t *tl_buf3,
+                                cvk_tl_t *tl_y0_buf, cvk_tl_t *tl_invert_buf,
+                                cvk_tl_t *tl_pos_neg_buf,
+                                cvk_tl_t *tl_table_answer,
+                                cvk_tl_t *tl_table_answer_mantissa,
                                 cvk_tl_t *tl_ofmap_bf16, cvk_fmt_t fmt);
 /**
  * @brief implement atan2 in tpu memory, implemented by atan. you can refer
@@ -605,17 +645,19 @@ void cvm_atan2_fast_degree_emit(cvk_context_t *cvk_ctx, cvk_tl_t *y, cvk_tl_t *x
  * @param tl_invert_buf lookup table in tpu memory
  * @param tl_pos_neg_buf lookup table in memory
  * @param tl_table_answer reciprocal for bf16 exponent part in tpu memory
- * @param tl_table_answer_mantissa reciprocal for bf16 fraction part in tpu memory
+ * @param tl_table_answer_mantissa reciprocal for bf16 fraction part in tpu
+ * memory
  * @param [out] tl_ofmap_bf16 result in tpu memory
  * @param fmt tensor format such as \CVK_FMT_BF16
  *
  * @example
  * // 1. alloc in tpu memory
  * // 2.1. get reciprocal table in host
- * cvm_reciprocal_tbl(table_reciprocal_data, table_reciprocal_data_mantissa, &table_shape);
+ * cvm_reciprocal_tbl(table_reciprocal_data, table_reciprocal_data_mantissa,
+ * &table_shape);
  * // 2.2. get atan table in host
- * cvm_atan_fast_degree_tbl(table_data_atan_y0, table_data_atan_slope, table_data_atan_invert,
- *              table_data_atan_pos_neg, &table_shape);
+ * cvm_atan_fast_degree_tbl(table_data_atan_y0, table_data_atan_slope,
+ * table_data_atan_invert, table_data_atan_pos_neg, &table_shape);
  * // 3. put host data to tpu memory
  * // 4. prepare command buffer
  * cvm_atan2_fast_degree_emit(
@@ -626,13 +668,15 @@ void cvm_atan2_fast_degree_emit(cvk_context_t *cvk_ctx, cvk_tl_t *y, cvk_tl_t *x
  * // 5. submit it
  * test_submit_comp(rt_ctx, cvk_ctx);
  * // 6. get result from tpu memory
- * uint16_t *ofmap_data = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx, tl_ofmap_bf16,
- * tl_ofmap_bf16->fmt);
+ * uint16_t *ofmap_data = (uint16_t *)get_bf16_tensor_l2g(rt_ctx, cvk_ctx,
+ * tl_ofmap_bf16, tl_ofmap_bf16->fmt);
  */
-void cvm_atan2_merge_emit(cvk_context_t *cvk_ctx, cvk_tl_t *y, cvk_tl_t *x, cvk_tl_t *tl_buf,
-                          cvk_tl_t *tl_buf2, cvk_tl_t *tl_buf3, cvk_tl_t *tl_y0_buf,
+void cvm_atan2_merge_emit(cvk_context_t *cvk_ctx, cvk_tl_t *y, cvk_tl_t *x,
+                          cvk_tl_t *tl_buf, cvk_tl_t *tl_buf2,
+                          cvk_tl_t *tl_buf3, cvk_tl_t *tl_y0_buf,
                           cvk_tl_t *tl_invert_buf, cvk_tl_t *tl_pos_neg_buf,
-                          cvk_tl_t *tl_table_answer, cvk_tl_t *tl_table_answer_mantissa,
+                          cvk_tl_t *tl_table_answer,
+                          cvk_tl_t *tl_table_answer_mantissa,
                           cvk_tl_t *tl_ofmap_bf16, cvk_fmt_t fmt);
 
 /**
@@ -644,7 +688,8 @@ void cvm_atan2_merge_emit(cvk_context_t *cvk_ctx, cvk_tl_t *y, cvk_tl_t *x, cvk_
  *
  * @return table size in bytes
  */
-uint64_t cvm_lut_tbl_bytesize(cvk_context_t *cvk_ctx, cvk_tl_shape_t *table_shape, cvk_fmt_t fmt);
+uint64_t cvm_lut_tbl_bytesize(cvk_context_t *cvk_ctx,
+                              cvk_tl_shape_t *table_shape, cvk_fmt_t fmt);
 
 /**
  * @brief calculate new proper reshape channel for depthwise
@@ -661,7 +706,8 @@ uint64_t cvm_lut_tbl_bytesize(cvk_context_t *cvk_ctx, cvk_tl_shape_t *table_shap
  * @param stride_h stride h with input
  * @param stride_w stride w with input
  * @param [out] tl_load_shape shape structure for input in tpu memory
- * @param [out] new_tl_ifmap_stride deprecated that stride for input in tpu memory
+ * @param [out] new_tl_ifmap_stride deprecated that stride for input in tpu
+ memory
  * @param [out] new_tg_ifmap_shape shape structure for input in device memory
  * @param [out] new_tg_ifmap_stride stride structure for input in device memory
  * @param [out] new_tl_weight_shape reshape weight in tpu memory
@@ -686,7 +732,8 @@ uint64_t cvm_lut_tbl_bytesize(cvk_context_t *cvk_ctx, cvk_tl_shape_t *table_shap
  * // 2.1 load input
  * // load input into tpu memory
  * int load_align = 0; // not align for pack
- * tmp_tl_load = cvk_ctx->ops->lmem_alloc_tensor(cvk_ctx, tl_load_shape, fmt, load_align);
+ * tmp_tl_load = cvk_ctx->ops->lmem_alloc_tensor(cvk_ctx, tl_load_shape, fmt,
+ load_align);
  * tmp_tg = test_alloc_tg_mem_comp(&rt_ctx, cvk_ctx, tg_shape, fmt);
  * tmp_tg->stride = tg_stride;
 
@@ -707,7 +754,8 @@ uint64_t cvm_lut_tbl_bytesize(cvk_context_t *cvk_ctx, cvk_tl_shape_t *table_shap
  * if (has_bias) {
  *   // bias must i8
  *   int no_bias_align = 0;
- *   p->bias = cvk_ctx->ops->lmem_alloc_tensor(cvk_ctx, tl_bias_shape, fmt, no_bias_align);
+ *   p->bias = cvk_ctx->ops->lmem_alloc_tensor(cvk_ctx, tl_bias_shape, fmt,
+ no_bias_align);
  *
  *   // duplicate bias and replace old
  *   uint32_t *new_bias = cvm_reshape_channel_weight(
@@ -720,10 +768,12 @@ uint64_t cvm_lut_tbl_bytesize(cvk_context_t *cvk_ctx, cvk_tl_shape_t *table_shap
  * // 2.3 prepare load weight, put to tg and load back
  * {
  *   int weight_align = 1;
- *   p->weight = cvk_ctx->ops->lmem_alloc_tensor(cvk_ctx, tl_weight_shape, fmt, weight_align);
+ *   p->weight = cvk_ctx->ops->lmem_alloc_tensor(cvk_ctx, tl_weight_shape, fmt,
+ weight_align);
  *   // duplicate kernel with c
  *   uint8_t *new_weight = cvm_reshape_channel_weight(
- *       (uint8_t *)weight, tl_weight_shape.n, tl_weight_shape.c, tl_weight_shape.h,
+ *       (uint8_t *)weight, tl_weight_shape.n, tl_weight_shape.c,
+ tl_weight_shape.h,
  *       tl_weight_shape.w, org_oc, fmt);
  *
  *   test_put_tensor_g2l_comp(&rt_ctx, cvk_ctx, p->weight, (u16 *)weight);
@@ -733,7 +783,8 @@ uint64_t cvm_lut_tbl_bytesize(cvk_context_t *cvk_ctx, cvk_tl_shape_t *table_shap
  * {
  *   // we allocate 'same' mode shape
  *   int output_align = 1; // hw need
- *   p->ofmap = cvk_ctx->ops->lmem_alloc_tensor(cvk_ctx, tl_output_shape, fmt, output_align);
+ *   p->ofmap = cvk_ctx->ops->lmem_alloc_tensor(cvk_ctx, tl_output_shape, fmt,
+ output_align);
  * }
  *
  * // 3. prepare command buffer
@@ -747,13 +798,13 @@ uint64_t cvm_lut_tbl_bytesize(cvk_context_t *cvk_ctx, cvk_tl_shape_t *table_shap
  *
  * @return status, -1 means fail, other means reshape slice success
  */
-int cvm_reshape_channel_same(cvk_context_t *cvk_ctx, int ic, int ih, int iw, int kh, int kw,
-                             int pad_right, int pad_left, int stride_h, int stride_w,
-                             cvk_tl_shape_t *tl_load_shape, cvk_tl_stride_t *new_tl_ifmap_stride,
-                             cvk_tg_shape_t *new_tg_ifmap_shape,
-                             cvk_tg_stride_t *new_tg_ifmap_stride,
-                             cvk_tl_shape_t *new_tl_weight_shape, cvk_tl_shape_t *new_tl_bias_shape,
-                             cvk_tl_shape_t *new_tl_ofmap_shape, cvk_fmt_t fmt, int eu_align);
+int cvm_reshape_channel_same(
+    cvk_context_t *cvk_ctx, int ic, int ih, int iw, int kh, int kw,
+    int pad_right, int pad_left, int stride_h, int stride_w,
+    cvk_tl_shape_t *tl_load_shape, cvk_tl_stride_t *new_tl_ifmap_stride,
+    cvk_tg_shape_t *new_tg_ifmap_shape, cvk_tg_stride_t *new_tg_ifmap_stride,
+    cvk_tl_shape_t *new_tl_weight_shape, cvk_tl_shape_t *new_tl_bias_shape,
+    cvk_tl_shape_t *new_tl_ofmap_shape, cvk_fmt_t fmt, int eu_align);
 
 /**
  * @brief re-construct bias content by reshape channel
@@ -768,8 +819,8 @@ int cvm_reshape_channel_same(cvk_context_t *cvk_ctx, int ic, int ih, int iw, int
  *
  * @return bias host data
  */
-uint32_t *cvm_reshape_channel_bias(uint8_t *bias, int ni, int ci, int hi, int wi, int old_bias_c,
-                                   cvk_fmt_t fmt);
+uint32_t *cvm_reshape_channel_bias(uint8_t *bias, int ni, int ci, int hi,
+                                   int wi, int old_bias_c, cvk_fmt_t fmt);
 
 /**
  * @brief re-construct weight content by reshape channel
@@ -784,8 +835,8 @@ uint32_t *cvm_reshape_channel_bias(uint8_t *bias, int ni, int ci, int hi, int wi
  *
  * @return weight host data
  */
-uint8_t *cvm_reshape_channel_weight(uint8_t *weight, int ni, int ci, int hi, int wi,
-                                    int old_weight_c, cvk_fmt_t fmt);
+uint8_t *cvm_reshape_channel_weight(uint8_t *weight, int ni, int ci, int hi,
+                                    int wi, int old_weight_c, cvk_fmt_t fmt);
 
 typedef struct cvm_tiu_atan2_param {
   cvk_tl_t *a;
@@ -848,7 +899,8 @@ typedef struct cvm_tiu_sqrt_param {
  * @param quantized_multiplier
  * @param right_shift
  */
-void cvm_get_chl_quan(float real_multiplier, uint32_t *quantized_multiplier, int *right_shift);
+void cvm_get_chl_quan(float real_multiplier, uint32_t *quantized_multiplier,
+                      int *right_shift);
 
 /**
  * @brief
@@ -860,9 +912,10 @@ void cvm_get_chl_quan(float real_multiplier, uint32_t *quantized_multiplier, int
  * @param bias_data
  * @param has_bias
  */
-void cvm_fill_chl_quan_data(const uint32_t c, const uint32_t quantized_multiplier,
-                            const int right_shift, uint8_t *cal_data, int32_t *bias_data,
-                            bool has_bias);
+void cvm_fill_chl_quan_data(const uint32_t c,
+                            const uint32_t quantized_multiplier,
+                            const int right_shift, uint8_t *cal_data,
+                            int32_t *bias_data, bool has_bias);
 
 /**
  * @brief
@@ -875,8 +928,10 @@ void cvm_fill_chl_quan_data(const uint32_t c, const uint32_t quantized_multiplie
  *
  * @return
  */
-uint8_t *cvm_get_chl_quan_data(const uint32_t c, const uint32_t quantized_multiplier,
-                               const int right_shift, int32_t *bias_data, bool has_bias);
+uint8_t *cvm_get_chl_quan_data(const uint32_t c,
+                               const uint32_t quantized_multiplier,
+                               const int right_shift, int32_t *bias_data,
+                               bool has_bias);
 
 /**
  * @brief get byte size of input \fmt
@@ -900,7 +955,8 @@ int cvm_bytesize_of_fmt(cvk_fmt_t fmt);
  * more details
  *
  * @param cvk_ctx kernel structure
- * @param [out] mp_tl_mulsum input tensor in tpu memory, the shape should be <1, c, h, w>
+ * @param [out] mp_tl_mulsum input tensor in tpu memory, the shape should be <1,
+ * c, h, w>
  *
  * @return status, 0 means success, other means generates command fail
  */
@@ -922,10 +978,11 @@ int cvm_reduce_hw_mul(cvk_context_t *cvk_ctx, cvk_tl_t *mp_tl_mulsum);
  *
  * @param cvk_ctx kernel structure
  * @param tg_bf16 bf16 data in device memory
- * @param [out] tg_fp32 fp32 data in decive memory, the w shape SHOULD be double with
- * \tg_bf16->shape.w
+ * @param [out] tg_fp32 fp32 data in decive memory, the w shape SHOULD be double
+ * with \tg_bf16->shape.w
  */
-void cvm_bf16_fp32(cvk_context_t *cvk_ctx, cvk_tg_t *tg_bf16, cvk_tg_t *tg_fp32);
+void cvm_bf16_fp32(cvk_context_t *cvk_ctx, cvk_tg_t *tg_bf16,
+                   cvk_tg_t *tg_fp32);
 
 /**
  * @brief set value by mask(0/1)
@@ -937,8 +994,9 @@ void cvm_bf16_fp32(cvk_context_t *cvk_ctx, cvk_tg_t *tg_bf16, cvk_tg_t *tg_fp32)
  *
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_set_image_by_u8mask(cvk_context_t *ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf,
-                            cvk_tl_t *tl_mask, cvk_tl_t *tl_ofmap);
+int cvm_set_image_by_u8mask(cvk_context_t *ctx, cvk_tl_t *tl_ifmap,
+                            cvk_tl_t *tl_buf, cvk_tl_t *tl_mask,
+                            cvk_tl_t *tl_ofmap);
 
 /**
  * @brief set value by mask(0/1) by DePthwise
@@ -947,17 +1005,19 @@ int cvm_set_image_by_u8mask(cvk_context_t *ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl
  *
  * @param [in] tl_ifmap image input, MUST uint8
  * @param [in] tl_mask mask value, it MUST be 0 or 1, it will DIRTY it
- * @param [in] tl_kernel for mask reverting(0/1->1/0) that the contain MUST BE -1 with int8
- * and shape SHOULD BE <1, tl_ifmap->shape.c, 1, 1>
- * @param [in] tl_bias for mask reverting(0/1->1/0) that the contain MUST BE 1 with int8,
- * seperate high/low part, and shape SHOULD BE <2, tl_ifmap->shape.c, 1, 1>
+ * @param [in] tl_kernel for mask reverting(0/1->1/0) that the contain MUST BE
+ * -1 with int8 and shape SHOULD BE <1, tl_ifmap->shape.c, 1, 1>
+ * @param [in] tl_bias for mask reverting(0/1->1/0) that the contain MUST BE 1
+ * with int8, seperate high/low part, and shape SHOULD BE <2, tl_ifmap->shape.c,
+ * 1, 1>
  * @param [in,out] tl_ofmap image output, MUST uint8, it will DIRTY it
  *
  * @return status, 0 means success, other means generates command fail
  */
 
-int cvm_set_image_by_u8mask_dp(cvk_context_t *ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_mask,
-                               cvk_tl_t *tl_kernel, cvk_tl_t *tl_bias, cvk_tl_t *tl_ofmap);
+int cvm_set_image_by_u8mask_dp(cvk_context_t *ctx, cvk_tl_t *tl_ifmap,
+                               cvk_tl_t *tl_mask, cvk_tl_t *tl_kernel,
+                               cvk_tl_t *tl_bias, cvk_tl_t *tl_ofmap);
 
 /**
  * @brief set value by mask and threshold, set it
@@ -970,8 +1030,9 @@ int cvm_set_image_by_u8mask_dp(cvk_context_t *ctx, cvk_tl_t *tl_ifmap, cvk_tl_t 
  *
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_set_image_by_two_info_i8(cvk_context_t *ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf2,
-                                 cvk_tl_t *tl_mask, cvk_tl_t *tl_update_tbl, uint8_t threshold,
+int cvm_set_image_by_two_info_i8(cvk_context_t *ctx, cvk_tl_t *tl_ifmap,
+                                 cvk_tl_t *tl_buf2, cvk_tl_t *tl_mask,
+                                 cvk_tl_t *tl_update_tbl, uint8_t threshold,
                                  cvk_tl_t *tl_ofmap);
 
 /**
@@ -991,8 +1052,9 @@ int cvm_set_image_by_two_info_i8(cvk_context_t *ctx, cvk_tl_t *tl_ifmap, cvk_tl_
  * @return status, 0 means success, other means generates command fail
  */
 
-int cvm_set_image_by_two_info_i8_dp(cvk_context_t *ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_kernel,
-                                    cvk_tl_t *tl_mask, cvk_tl_t *tl_update_tbl,
+int cvm_set_image_by_two_info_i8_dp(cvk_context_t *ctx, cvk_tl_t *tl_ifmap,
+                                    cvk_tl_t *tl_kernel, cvk_tl_t *tl_mask,
+                                    cvk_tl_t *tl_update_tbl,
                                     cvk_tl_t *tl_threshold, cvk_tl_t *tl_ofmap);
 
 /**
@@ -1002,10 +1064,12 @@ int cvm_set_image_by_two_info_i8_dp(cvk_context_t *ctx, cvk_tl_t *tl_ifmap, cvk_
  * @param [in] tl_ifmap2 image input, MUST uint8, it will DIRTY it
  * @param [out] tl_ofmap image output, MUST uint8, it will DIRTY it
  *
- * @return status, 0 means success, o, MUST uint8ther means generates command fail
+ * @return status, 0 means success, o, MUST uint8ther means generates command
+ * fail
  */
-int cvm_gen_image_diff(cvk_context_t *ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_ifmap2,
-                       cvk_tl_t *tl_buf, cvk_tl_t *tl_buf2, cvk_tl_t *tl_ofmap);
+int cvm_gen_image_diff(cvk_context_t *ctx, cvk_tl_t *tl_ifmap,
+                       cvk_tl_t *tl_ifmap2, cvk_tl_t *tl_buf, cvk_tl_t *tl_buf2,
+                       cvk_tl_t *tl_ofmap);
 
 /**
  * @brief update \tl_ofmap by \threshold_a, \threshold_b,
@@ -1017,12 +1081,15 @@ int cvm_gen_image_diff(cvk_context_t *ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_ifma
  *
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_update_tbl_by_threshold(cvk_context_t *ctx, cvk_tl_t *tl_mask, cvk_tl_t *tl_buf,
-                                cvk_tl_t *tl_buf2, cvk_tl_t *tl_buf3, cvk_tl_t *tl_update_tbl,
-                                uint8_t threshold_a, uint8_t threshold_b, cvk_tl_t *tl_ofmap);
+int cvm_update_tbl_by_threshold(cvk_context_t *ctx, cvk_tl_t *tl_mask,
+                                cvk_tl_t *tl_buf, cvk_tl_t *tl_buf2,
+                                cvk_tl_t *tl_buf3, cvk_tl_t *tl_update_tbl,
+                                uint8_t threshold_a, uint8_t threshold_b,
+                                cvk_tl_t *tl_ofmap);
 
 /**
- * @brief set value by mask, update \tl_ofmap once (uint8_t)tl_update_tbl >= threshold
+ * @brief set value by mask, update \tl_ofmap once (uint8_t)tl_update_tbl >=
+ * threshold
  *
  * @param [in] tl_ifmap image input, MUST uint8
  * @param [in] tl_update_tbl the value range will under uint8
@@ -1030,8 +1097,9 @@ int cvm_update_tbl_by_threshold(cvk_context_t *ctx, cvk_tl_t *tl_mask, cvk_tl_t 
  *
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_set_image_by_two_info_u8(cvk_context_t *ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf,
-                                 cvk_tl_t *tl_buf2, cvk_tl_t *tl_update_tbl, uint8_t threshold,
+int cvm_set_image_by_two_info_u8(cvk_context_t *ctx, cvk_tl_t *tl_ifmap,
+                                 cvk_tl_t *tl_buf, cvk_tl_t *tl_buf2,
+                                 cvk_tl_t *tl_update_tbl, uint8_t threshold,
                                  cvk_tl_t *tl_ofmap);
 
 /**
@@ -1044,8 +1112,9 @@ int cvm_set_image_by_two_info_u8(cvk_context_t *ctx, cvk_tl_t *tl_ifmap, cvk_tl_
  *
  * @return status, 0 means success, other means generates command fail
  */
-int cvm_blend_image_by_tbl(cvk_context_t *ctx, cvk_tl_t *tl_ifmap, cvk_tl_t *tl_buf,
-                           cvk_tl_t *tl_buf2, cvk_tl_t *tl_update_tbl, uint8_t threshold,
+int cvm_blend_image_by_tbl(cvk_context_t *ctx, cvk_tl_t *tl_ifmap,
+                           cvk_tl_t *tl_buf, cvk_tl_t *tl_buf2,
+                           cvk_tl_t *tl_update_tbl, uint8_t threshold,
                            uint8_t w1, uint8_t w2, cvk_tl_t *tl_ofmap);
 /**
  * @brief get upsample 2d with nearest mode
@@ -1063,4 +1132,4 @@ int cvm_upsample2d(cvk_context_t *ctx, cvk_tl_t *tl_input, cvk_tl_t *tl_weight,
 }
 #endif
 
-#endif  // CVIMATH_INTERNAL_H
+#endif // CVIMATH_INTERNAL_H

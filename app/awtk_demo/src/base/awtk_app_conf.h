@@ -3,13 +3,13 @@
 #define WITHOUT_WINDOW_ANIMATORS 1
 
 //#define WITHOUT_INPUT_METHOD 1
-//WITH_TRUETYPE_FONT
-//AWTK_WEB
+// WITH_TRUETYPE_FONT
+// AWTK_WEB
 #define WITHOUT_DIALOG_HIGHLIGHTER 1
 #define WITHOUT_WIDGET_ANIMATORS 1
 #define WITHOUT_CLIPBOARD 1
 #define WITH_BITMAP_BGRA 1
-//WITH_NULL_IM
+// WITH_NULL_IM
 
 #define WITH_NANOVG_AGGE
 #define WITH_VGCANVAS
@@ -39,8 +39,8 @@
 #define APP_THEME "default"
 #endif /*APP_THEME*/
 
-//it will See the ghosting when a widget is placed on a transparent background
-//we should clear buffer before refresh widget
+// it will See the ghosting when a widget is placed on a transparent background
+// we should clear buffer before refresh widget
 #define CVI_CUSTOMIZATION
 #define WITH_LCD_CLEAR_ALPHA 1
 
@@ -51,4 +51,3 @@ extern ret_t application_exit();
 #else
 #error "include awtk_app_conf twice"
 #endif /* End of #ifndef __AWTK_APP_CONF_H__*/
-

@@ -28,18 +28,18 @@
  * @brief HW image channel alignment.
  */
 #define SCALAR_4096_ALIGN_BUG 0x1000
-#define max(a, b)           \
-  ({                        \
-    __typeof__(a) _a = (a); \
-    __typeof__(b) _b = (b); \
-    _a > _b ? _a : _b;      \
+#define max(a, b)                                                              \
+  ({                                                                           \
+    __typeof__(a) _a = (a);                                                    \
+    __typeof__(b) _b = (b);                                                    \
+    _a > _b ? _a : _b;                                                         \
   })
 
-#define min(a, b)           \
-  ({                        \
-    __typeof__(a) _a = (a); \
-    __typeof__(b) _b = (b); \
-    _a < _b ? _a : _b;      \
+#define min(a, b)                                                              \
+  ({                                                                           \
+    __typeof__(a) _a = (a);                                                    \
+    __typeof__(b) _b = (b);                                                    \
+    _a < _b ? _a : _b;                                                         \
   })
 
 /**
@@ -49,7 +49,8 @@
  * @param stVbConf The middleware config structure.
  * @return int Return CVI_SUCCESS on success.
  */
-static inline int __attribute__((always_inline)) MMF_INIT(const VB_CONFIG_S *stVbConf) {
+static inline int __attribute__((always_inline))
+MMF_INIT(const VB_CONFIG_S *stVbConf) {
   CVI_S32 s32Ret = CVI_FAILURE;
 
   CVI_SYS_Exit();
@@ -76,7 +77,8 @@ static inline int __attribute__((always_inline)) MMF_INIT(const VB_CONFIG_S *stV
 }
 
 /**
- * @brief A helper function to open one input and one output memory pool for developers.
+ * @brief A helper function to open one input and one output memory pool for
+ * developers.
  * @ingroup core_vpss
  *
  * @param enSrcWidth Desired input image width.
@@ -90,8 +92,9 @@ static inline int __attribute__((always_inline)) MMF_INIT(const VB_CONFIG_S *stV
  * @return int Return CVI_SUCCESS on success.
  */
 static inline int __attribute__((always_inline))
-MMF_INIT_HELPER2(uint32_t enSrcWidth, uint32_t enSrcHeight, PIXEL_FORMAT_E enSrcFormat,
-                 const uint32_t inBlkCount, uint32_t enDstWidth, uint32_t enDstHeight,
+MMF_INIT_HELPER2(uint32_t enSrcWidth, uint32_t enSrcHeight,
+                 PIXEL_FORMAT_E enSrcFormat, const uint32_t inBlkCount,
+                 uint32_t enDstWidth, uint32_t enDstHeight,
                  PIXEL_FORMAT_E enDstFormat, const uint32_t outBlkCount) {
   COMPRESS_MODE_E enCompressMode = COMPRESS_MODE_NONE;
   // Init SYS and Common VB,
@@ -101,12 +104,14 @@ MMF_INIT_HELPER2(uint32_t enSrcWidth, uint32_t enSrcHeight, PIXEL_FORMAT_E enSrc
   memset(&stVbConf, 0, sizeof(VB_CONFIG_S));
   stVbConf.u32MaxPoolCnt = 2;
   CVI_U32 u32BlkSize;
-  u32BlkSize = COMMON_GetPicBufferSize(enSrcWidth, enSrcHeight, enSrcFormat, DATA_BITWIDTH_8,
-                                       enCompressMode, DEFAULT_ALIGN);
+  u32BlkSize =
+      COMMON_GetPicBufferSize(enSrcWidth, enSrcHeight, enSrcFormat,
+                              DATA_BITWIDTH_8, enCompressMode, DEFAULT_ALIGN);
   stVbConf.astCommPool[0].u32BlkSize = u32BlkSize;
   stVbConf.astCommPool[0].u32BlkCnt = inBlkCount;
-  u32BlkSize = COMMON_GetPicBufferSize(enDstWidth, enDstHeight, enDstFormat, DATA_BITWIDTH_8,
-                                       enCompressMode, DEFAULT_ALIGN);
+  u32BlkSize =
+      COMMON_GetPicBufferSize(enDstWidth, enDstHeight, enDstFormat,
+                              DATA_BITWIDTH_8, enCompressMode, DEFAULT_ALIGN);
   stVbConf.astCommPool[1].u32BlkSize = u32BlkSize;
   stVbConf.astCommPool[1].u32BlkCnt = outBlkCount;
 
@@ -114,8 +119,8 @@ MMF_INIT_HELPER2(uint32_t enSrcWidth, uint32_t enSrcHeight, PIXEL_FORMAT_E enSrc
 }
 
 /**
- * @brief A helper function to open one input and one output memory pool with default image number
- * for developers.
+ * @brief A helper function to open one input and one output memory pool with
+ * default image number for developers.
  * @ingroup core_vpss
  *
  * @param enSrcWidth Desired input image width.
@@ -127,14 +132,17 @@ MMF_INIT_HELPER2(uint32_t enSrcWidth, uint32_t enSrcHeight, PIXEL_FORMAT_E enSrc
  * @return int Return CVI_SUCCESS on success.
  */
 static inline int __attribute__((always_inline))
-MMF_INIT_HELPER(uint32_t enSrcWidth, uint32_t enSrcHeight, PIXEL_FORMAT_E enSrcFormat,
-                uint32_t enDstWidth, uint32_t enDstHeight, PIXEL_FORMAT_E enDstFormat) {
-  return MMF_INIT_HELPER2(enSrcWidth, enSrcHeight, enSrcFormat, MMF_INIT_HELPER_BLKCNT_DEFAULT,
-                          enDstWidth, enDstHeight, enDstFormat, MMF_INIT_HELPER_BLKCNT_DEFAULT);
+MMF_INIT_HELPER(uint32_t enSrcWidth, uint32_t enSrcHeight,
+                PIXEL_FORMAT_E enSrcFormat, uint32_t enDstWidth,
+                uint32_t enDstHeight, PIXEL_FORMAT_E enDstFormat) {
+  return MMF_INIT_HELPER2(
+      enSrcWidth, enSrcHeight, enSrcFormat, MMF_INIT_HELPER_BLKCNT_DEFAULT,
+      enDstWidth, enDstHeight, enDstFormat, MMF_INIT_HELPER_BLKCNT_DEFAULT);
 }
 
 /**
- * @brief A helper function to get default VPSS_GRP_ATTR_S value with given image information.
+ * @brief A helper function to get default VPSS_GRP_ATTR_S value with given
+ * image information.
  * @ingroup core_vpss
  *
  * @param srcWidth Input image width.
@@ -143,8 +151,9 @@ MMF_INIT_HELPER(uint32_t enSrcWidth, uint32_t enSrcHeight, PIXEL_FORMAT_E enSrcF
  * @param dev vpss device id
  */
 inline void __attribute__((always_inline))
-VPSS_GRP_DEFAULT_HELPER2(VPSS_GRP_ATTR_S *pstVpssGrpAttr, CVI_U32 srcWidth, CVI_U32 srcHeight,
-                         PIXEL_FORMAT_E enSrcFormat, CVI_U8 dev) {
+VPSS_GRP_DEFAULT_HELPER2(VPSS_GRP_ATTR_S *pstVpssGrpAttr, CVI_U32 srcWidth,
+                         CVI_U32 srcHeight, PIXEL_FORMAT_E enSrcFormat,
+                         CVI_U8 dev) {
   memset(pstVpssGrpAttr, 0, sizeof(VPSS_GRP_ATTR_S));
   pstVpssGrpAttr->stFrameRate.s32SrcFrameRate = -1;
   pstVpssGrpAttr->stFrameRate.s32DstFrameRate = -1;
@@ -155,7 +164,8 @@ VPSS_GRP_DEFAULT_HELPER2(VPSS_GRP_ATTR_S *pstVpssGrpAttr, CVI_U32 srcWidth, CVI_
 }
 
 /**
- * @brief A helper function to get default VPSS_GRP_ATTR_S value with given image information.
+ * @brief A helper function to get default VPSS_GRP_ATTR_S value with given
+ * image information.
  * @ingroup core_vpss
  *
  * @param srcWidth Input image width.
@@ -163,13 +173,14 @@ VPSS_GRP_DEFAULT_HELPER2(VPSS_GRP_ATTR_S *pstVpssGrpAttr, CVI_U32 srcWidth, CVI_
  * @param enSrcFormat Input image format.
  */
 inline void __attribute__((always_inline))
-VPSS_GRP_DEFAULT_HELPER(VPSS_GRP_ATTR_S *pstVpssGrpAttr, CVI_U32 srcWidth, CVI_U32 srcHeight,
-                        PIXEL_FORMAT_E enSrcFormat) {
+VPSS_GRP_DEFAULT_HELPER(VPSS_GRP_ATTR_S *pstVpssGrpAttr, CVI_U32 srcWidth,
+                        CVI_U32 srcHeight, PIXEL_FORMAT_E enSrcFormat) {
   VPSS_GRP_DEFAULT_HELPER2(pstVpssGrpAttr, srcWidth, srcHeight, enSrcFormat, 0);
 }
 
 /**
- * @brief A helper function to get default VPSS_CHN_ATTR_S value with given image information.
+ * @brief A helper function to get default VPSS_CHN_ATTR_S value with given
+ * image information.
  * @ingroup core_vpss
  *
  * @param dstWidth Output image width.
@@ -178,8 +189,9 @@ VPSS_GRP_DEFAULT_HELPER(VPSS_GRP_ATTR_S *pstVpssGrpAttr, CVI_U32 srcWidth, CVI_U
  * @param keepAspectRatio Keep aspect ratio or not.
  */
 inline void __attribute__((always_inline))
-VPSS_CHN_DEFAULT_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, CVI_U32 dstWidth, CVI_U32 dstHeight,
-                        PIXEL_FORMAT_E enDstFormat, CVI_BOOL keepAspectRatio) {
+VPSS_CHN_DEFAULT_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, CVI_U32 dstWidth,
+                        CVI_U32 dstHeight, PIXEL_FORMAT_E enDstFormat,
+                        CVI_BOOL keepAspectRatio) {
   pastVpssChnAttr->u32Width = dstWidth;
   pastVpssChnAttr->u32Height = dstHeight;
   pastVpssChnAttr->enVideoFormat = VIDEO_FORMAT_LINEAR;
@@ -207,8 +219,8 @@ VPSS_CHN_DEFAULT_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, CVI_U32 dstWidth, CVI_
 }
 
 /**
- * @brief A helper function with manual ratio control to get default VPSS_CHN_ATTR_S value with
- * given image information.
+ * @brief A helper function with manual ratio control to get default
+ * VPSS_CHN_ATTR_S value with given image information.
  * @ingroup core_vpss
  *
  * @param dstWidth Output image width.
@@ -216,15 +228,16 @@ VPSS_CHN_DEFAULT_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, CVI_U32 dstWidth, CVI_
  * @param enDstFormat Output image format.
  * @param ratioX The upper-left x coordinate.
  * @param ratioY The upper-left y coordinate.
- * @param ratioWidth The desired width of the image from group. Black will be filled if (ratioX +
- * ratioWidth) < dstWidth.
- * @param ratioHeight The desired height of the image grom group. Black will be filled if (ratioY +
- * ratioWidth) < dstHeight.
+ * @param ratioWidth The desired width of the image from group. Black will be
+ * filled if (ratioX + ratioWidth) < dstWidth.
+ * @param ratioHeight The desired height of the image grom group. Black will be
+ * filled if (ratioY + ratioWidth) < dstHeight.
  */
 inline void __attribute__((always_inline))
-VPSS_CHN_RATIO_MANUAL_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, CVI_U32 dstWidth, CVI_U32 dstHeight,
-                             PIXEL_FORMAT_E enDstFormat, CVI_U32 ratioX, CVI_U32 ratioY,
-                             CVI_U32 ratioWidth, CVI_U32 ratioHeight) {
+VPSS_CHN_RATIO_MANUAL_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, CVI_U32 dstWidth,
+                             CVI_U32 dstHeight, PIXEL_FORMAT_E enDstFormat,
+                             CVI_U32 ratioX, CVI_U32 ratioY, CVI_U32 ratioWidth,
+                             CVI_U32 ratioHeight) {
   pastVpssChnAttr->u32Width = dstWidth;
   pastVpssChnAttr->u32Height = dstHeight;
   pastVpssChnAttr->enVideoFormat = VIDEO_FORMAT_LINEAR;
@@ -252,8 +265,8 @@ VPSS_CHN_RATIO_MANUAL_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, CVI_U32 dstWidth,
 }
 
 /**
- * @brief A helper function to help developers to create a quantization + scaling step for AI
- * preprocessing using vpss hardware.
+ * @brief A helper function to help developers to create a quantization +
+ * scaling step for AI preprocessing using vpss hardware.
  * @ingroup core_vpss
  *
  * @param dstWidth Output image width.
@@ -261,13 +274,14 @@ VPSS_CHN_RATIO_MANUAL_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, CVI_U32 dstWidth,
  * @param enDstFormat Output image format.
  * @param factor The quantized factor, size = 3.
  * @param mean The quantized mean, size = 3.
- * @param padReverse If your code do quantization + scale before padding, set this to true. Default
- * if false.
+ * @param padReverse If your code do quantization + scale before padding, set
+ * this to true. Default if false.
  */
 inline void __attribute__((always_inline))
 VPSS_CHN_SQ_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, const CVI_U32 dstWidth,
                    const CVI_U32 dstHeight, const PIXEL_FORMAT_E enDstFormat,
-                   const CVI_FLOAT *factor, const CVI_FLOAT *mean, const bool padReverse) {
+                   const CVI_FLOAT *factor, const CVI_FLOAT *mean,
+                   const bool padReverse) {
   pastVpssChnAttr->u32Width = dstWidth;
   pastVpssChnAttr->u32Height = dstHeight;
   pastVpssChnAttr->enVideoFormat = VIDEO_FORMAT_LINEAR;
@@ -280,8 +294,9 @@ VPSS_CHN_SQ_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, const CVI_U32 dstWidth,
   pastVpssChnAttr->stAspectRatio.enMode = ASPECT_RATIO_AUTO;
   pastVpssChnAttr->stAspectRatio.bEnableBgColor = CVI_TRUE;
   if (padReverse) {
-    pastVpssChnAttr->stAspectRatio.u32BgColor = RGB_8BIT(
-        (int)(mean[0] / factor[0]), (int)(mean[1] / factor[1]), (int)(mean[2] / factor[2]));
+    pastVpssChnAttr->stAspectRatio.u32BgColor =
+        RGB_8BIT((int)(mean[0] / factor[0]), (int)(mean[1] / factor[1]),
+                 (int)(mean[2] / factor[2]));
   } else {
     pastVpssChnAttr->stAspectRatio.u32BgColor = RGB_8BIT(0, 0, 0);
   }
@@ -296,8 +311,9 @@ VPSS_CHN_SQ_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, const CVI_U32 dstWidth,
 }
 
 /**
- * @brief A helper function to help developers to create a quantization + scaling step for AI
- * preprocessing using vpss hardware, but only pad right and bottom instead of four directions.
+ * @brief A helper function to help developers to create a quantization +
+ * scaling step for AI preprocessing using vpss hardware, but only pad right and
+ * bottom instead of four directions.
  * @ingroup core_vpss
  *
  * @param srcWidth Input image width.
@@ -307,14 +323,15 @@ VPSS_CHN_SQ_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, const CVI_U32 dstWidth,
  * @param enDstFormat Output image format.
  * @param factor The quantized factor, size = 3.
  * @param mean The quantized mean, size = 3.
- * @param padReverse If your code do quantization + scale before padding, set this to true. Default
- * if false.
+ * @param padReverse If your code do quantization + scale before padding, set
+ * this to true. Default if false.
  */
 inline void __attribute__((always_inline))
 VPSS_CHN_SQ_RB_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, const CVI_U32 srcWidth,
-                      const CVI_U32 srcHeight, const CVI_U32 dstWidth, const CVI_U32 dstHeight,
-                      const PIXEL_FORMAT_E enDstFormat, const CVI_FLOAT *factor,
-                      const CVI_FLOAT *mean, const bool padReverse) {
+                      const CVI_U32 srcHeight, const CVI_U32 dstWidth,
+                      const CVI_U32 dstHeight, const PIXEL_FORMAT_E enDstFormat,
+                      const CVI_FLOAT *factor, const CVI_FLOAT *mean,
+                      const bool padReverse) {
   float ratio_w = (float)dstWidth / srcWidth;
   float ratio_h = (float)dstHeight / srcHeight;
   float ratio = min(ratio_w, ratio_h);
@@ -331,12 +348,15 @@ VPSS_CHN_SQ_RB_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, const CVI_U32 srcWidth,
   pastVpssChnAttr->stAspectRatio.enMode = ASPECT_RATIO_MANUAL;
   pastVpssChnAttr->stAspectRatio.stVideoRect.s32X = 0;
   pastVpssChnAttr->stAspectRatio.stVideoRect.s32Y = 0;
-  pastVpssChnAttr->stAspectRatio.stVideoRect.u32Width = (srcWidth * ratio) + 0.5;
-  pastVpssChnAttr->stAspectRatio.stVideoRect.u32Height = (srcHeight * ratio) + 0.5;
+  pastVpssChnAttr->stAspectRatio.stVideoRect.u32Width =
+      (srcWidth * ratio) + 0.5;
+  pastVpssChnAttr->stAspectRatio.stVideoRect.u32Height =
+      (srcHeight * ratio) + 0.5;
   pastVpssChnAttr->stAspectRatio.bEnableBgColor = CVI_TRUE;
   if (padReverse) {
-    pastVpssChnAttr->stAspectRatio.u32BgColor = RGB_8BIT(
-        (int)(mean[0] / factor[0]), (int)(mean[1] / factor[1]), (int)(mean[2] / factor[2]));
+    pastVpssChnAttr->stAspectRatio.u32BgColor =
+        RGB_8BIT((int)(mean[0] / factor[0]), (int)(mean[1] / factor[1]),
+                 (int)(mean[2] / factor[2]));
   } else {
     pastVpssChnAttr->stAspectRatio.u32BgColor = RGB_8BIT(0, 0, 0);
   }
@@ -354,8 +374,8 @@ VPSS_CHN_SQ_RB_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, const CVI_U32 srcWidth,
 #undef min
 
 /**
- * @brief A helper function to init vpss hardware with given image information. This function DOES
- NOT set VPSS mode for you.
+ * @brief A helper function to init vpss hardware with given image information.
+ This function DOES NOT set VPSS mode for you.
 
  * @param enSrcWidth Input image width.
  * @param enSrcHeight Intput image height.
@@ -364,32 +384,37 @@ VPSS_CHN_SQ_RB_HELPER(VPSS_CHN_ATTR_S *pastVpssChnAttr, const CVI_U32 srcWidth,
  * @param enDstHeight Output image height.
  * @param enDstFormat Output image format.
  * @param enabledChannel Number of enabled channels.
- * @param mode The mode of VPSS. Support single mode (1->4) and dual mode (1->3, 1->1)
+ * @param mode The mode of VPSS. Support single mode (1->4) and dual mode (1->3,
+ 1->1)
  * @param keepAspectRatio Keep aspect ratio or not.
  */
 inline int __attribute__((always_inline))
 VPSS_INIT_HELPER2(CVI_U32 vpssGrpId, uint32_t enSrcWidth, uint32_t enSrcHeight,
-                  PIXEL_FORMAT_E enSrcFormat, uint32_t enDstWidth, uint32_t enDstHeight,
-                  PIXEL_FORMAT_E enDstFormat, uint32_t enabledChannel, bool keepAspectRatio) {
-  syslog(LOG_INFO, "VPSS init with src (%u, %u) dst (%u, %u).\n", enSrcWidth, enSrcHeight,
-         enDstWidth, enDstHeight);
+                  PIXEL_FORMAT_E enSrcFormat, uint32_t enDstWidth,
+                  uint32_t enDstHeight, PIXEL_FORMAT_E enDstFormat,
+                  uint32_t enabledChannel, bool keepAspectRatio) {
+  syslog(LOG_INFO, "VPSS init with src (%u, %u) dst (%u, %u).\n", enSrcWidth,
+         enSrcHeight, enDstWidth, enDstHeight);
   CVI_S32 s32Ret = CVI_FAILURE;
 
   VPSS_GRP_ATTR_S stVpssGrpAttr;
   VPSS_CHN_ATTR_S stVpssChnAttr;
   VPSS_GRP_DEFAULT_HELPER(&stVpssGrpAttr, enSrcWidth, enSrcHeight, enSrcFormat);
-  VPSS_CHN_DEFAULT_HELPER(&stVpssChnAttr, enDstWidth, enDstHeight, enDstFormat, keepAspectRatio);
+  VPSS_CHN_DEFAULT_HELPER(&stVpssChnAttr, enDstWidth, enDstHeight, enDstFormat,
+                          keepAspectRatio);
 
   /*start vpss*/
   s32Ret = CVI_VPSS_CreateGrp(vpssGrpId, &stVpssGrpAttr);
   if (s32Ret != CVI_SUCCESS) {
     printf("???? %d\n", vpssGrpId);
-    syslog(LOG_ERR, "CVI_VPSS_CreateGrp(grp:%d) failed with %#x!\n", vpssGrpId, s32Ret);
+    syslog(LOG_ERR, "CVI_VPSS_CreateGrp(grp:%d) failed with %#x!\n", vpssGrpId,
+           s32Ret);
     return s32Ret;
   }
   s32Ret = CVI_VPSS_ResetGrp(vpssGrpId);
   if (s32Ret != CVI_SUCCESS) {
-    syslog(LOG_ERR, "CVI_VPSS_ResetGrp(grp:%d) failed with %#x!\n", vpssGrpId, s32Ret);
+    syslog(LOG_ERR, "CVI_VPSS_ResetGrp(grp:%d) failed with %#x!\n", vpssGrpId,
+           s32Ret);
     return s32Ret;
   }
   if (enabledChannel > 3) {
@@ -417,8 +442,8 @@ VPSS_INIT_HELPER2(CVI_U32 vpssGrpId, uint32_t enSrcWidth, uint32_t enSrcHeight,
 }
 
 /**
- * @brief A helper function to init vpss hardware with given image information. This function sets
- VPSS mode for you.
+ * @brief A helper function to init vpss hardware with given image information.
+ This function sets VPSS mode for you.
 
  * @param enSrcWidth Input image width.
  * @param enSrcHeight Intput image height.
@@ -426,20 +451,24 @@ VPSS_INIT_HELPER2(CVI_U32 vpssGrpId, uint32_t enSrcWidth, uint32_t enSrcHeight,
  * @param enDstWidth Output image width.
  * @param enDstHeight Output image height.
  * @param enDstFormat Output image format.
- * @param mode The mode of VPSS. Support single mode (1->4) and dual mode (1->3, 1->1)
+ * @param mode The mode of VPSS. Support single mode (1->4) and dual mode (1->3,
+ 1->1)
  * @param keepAspectRatio Keep aspect ratio or not.
  */
 inline int __attribute__((always_inline))
 VPSS_INIT_HELPER(CVI_U32 vpssGrpId, uint32_t enSrcWidth, uint32_t enSrcHeight,
-                 PIXEL_FORMAT_E enSrcFormat, uint32_t enDstWidth, uint32_t enDstHeight,
-                 PIXEL_FORMAT_E enDstFormat, VPSS_MODE_E mode, bool keepAspectRatio) {
+                 PIXEL_FORMAT_E enSrcFormat, uint32_t enDstWidth,
+                 uint32_t enDstHeight, PIXEL_FORMAT_E enDstFormat,
+                 VPSS_MODE_E mode, bool keepAspectRatio) {
   CVI_SYS_SetVPSSMode(mode);
-  return VPSS_INIT_HELPER2(vpssGrpId, enSrcWidth, enSrcHeight, enSrcFormat, enDstWidth, enDstHeight,
-                           enDstFormat, 1, keepAspectRatio);
+  return VPSS_INIT_HELPER2(vpssGrpId, enSrcWidth, enSrcHeight, enSrcFormat,
+                           enDstWidth, enDstHeight, enDstFormat, 1,
+                           keepAspectRatio);
 }
 
 /**
- * @brief A helper function to create a VIDEO_FRAME_INFO_S buffer from given image information.
+ * @brief A helper function to create a VIDEO_FRAME_INFO_S buffer from given
+ * image information.
  * @ingroup core_vpss
  *
  * @param blk The ion instance of VIDEO_FRAME_INFO_S.
@@ -449,7 +478,8 @@ VPSS_INIT_HELPER(CVI_U32 vpssGrpId, uint32_t enSrcWidth, uint32_t enSrcHeight,
  * @param pixelFormat Desired image format.
  */
 inline int __attribute__((always_inline))
-CREATE_VBFRAME_HELPER(VB_BLK *blk, VIDEO_FRAME_INFO_S *vbFrame, CVI_U32 srcWidth, CVI_U32 srcHeight,
+CREATE_VBFRAME_HELPER(VB_BLK *blk, VIDEO_FRAME_INFO_S *vbFrame,
+                      CVI_U32 srcWidth, CVI_U32 srcHeight,
                       PIXEL_FORMAT_E pixelFormat) {
   // Create Src Video Frame
   VIDEO_FRAME_S *vFrame = &vbFrame->stVFrame;
@@ -465,72 +495,82 @@ CREATE_VBFRAME_HELPER(VB_BLK *blk, VIDEO_FRAME_INFO_S *vbFrame, CVI_U32 srcWidth
   vFrame->u32Width = srcWidth;
   vFrame->u32Height = srcHeight;
   switch (vFrame->enPixelFormat) {
-    case PIXEL_FORMAT_RGB_888:
-    case PIXEL_FORMAT_BGR_888: {
-      vFrame->u32Stride[0] = ALIGN(vFrame->u32Width * 3, DEFAULT_ALIGN);
-      vFrame->u32Stride[1] = 0;
-      vFrame->u32Stride[2] = 0;
-      // Don't need to align cause only 1 chn.
-      vFrame->u32Length[0] = vFrame->u32Stride[0] * vFrame->u32Height;
-      vFrame->u32Length[1] = 0;
-      vFrame->u32Length[2] = 0;
-    } break;
-    case PIXEL_FORMAT_RGB_888_PLANAR: {
-      vFrame->u32Stride[0] = ALIGN(vFrame->u32Width, DEFAULT_ALIGN);
-      vFrame->u32Stride[1] = vFrame->u32Stride[0];
-      vFrame->u32Stride[2] = vFrame->u32Stride[0];
-      vFrame->u32Length[0] = ALIGN(vFrame->u32Stride[0] * vFrame->u32Height, SCALAR_4096_ALIGN_BUG);
-      vFrame->u32Length[1] = vFrame->u32Length[0];
-      vFrame->u32Length[2] = vFrame->u32Length[0];
-    } break;
-    case PIXEL_FORMAT_YUV_PLANAR_422: {
-      vFrame->u32Stride[0] = ALIGN(vFrame->u32Width, DEFAULT_ALIGN);
-      vFrame->u32Stride[1] = ALIGN(vFrame->u32Width >> 1, DEFAULT_ALIGN);
-      vFrame->u32Stride[2] = ALIGN(vFrame->u32Width >> 1, DEFAULT_ALIGN);
-      vFrame->u32Length[0] = ALIGN(vFrame->u32Stride[0] * vFrame->u32Height, SCALAR_4096_ALIGN_BUG);
-      vFrame->u32Length[1] = ALIGN(vFrame->u32Stride[1] * vFrame->u32Height, SCALAR_4096_ALIGN_BUG);
-      vFrame->u32Length[2] = ALIGN(vFrame->u32Stride[2] * vFrame->u32Height, SCALAR_4096_ALIGN_BUG);
-    } break;
-    case PIXEL_FORMAT_YUV_PLANAR_420: {
-      uint32_t newHeight = ALIGN(vFrame->u32Height, 2);
-      vFrame->u32Stride[0] = ALIGN(vFrame->u32Width, DEFAULT_ALIGN);
-      vFrame->u32Stride[1] = ALIGN(vFrame->u32Width >> 1, DEFAULT_ALIGN);
-      vFrame->u32Stride[2] = ALIGN(vFrame->u32Width >> 1, DEFAULT_ALIGN);
-      vFrame->u32Length[0] = ALIGN(vFrame->u32Stride[0] * newHeight, SCALAR_4096_ALIGN_BUG);
-      vFrame->u32Length[1] = ALIGN(vFrame->u32Stride[1] * newHeight / 2, SCALAR_4096_ALIGN_BUG);
-      vFrame->u32Length[2] = ALIGN(vFrame->u32Stride[2] * newHeight / 2, SCALAR_4096_ALIGN_BUG);
-    } break;
-    case PIXEL_FORMAT_YUV_400: {
-      vFrame->u32Stride[0] = ALIGN(vFrame->u32Width, DEFAULT_ALIGN);
-      vFrame->u32Stride[1] = 0;
-      vFrame->u32Stride[2] = 0;
-      vFrame->u32Length[0] = vFrame->u32Stride[0] * vFrame->u32Height;
-      vFrame->u32Length[1] = 0;
-      vFrame->u32Length[2] = 0;
-    } break;
-    case PIXEL_FORMAT_FP32_C1: {
-      vFrame->u32Stride[0] = ALIGN(vFrame->u32Width * sizeof(float), DEFAULT_ALIGN);
-      vFrame->u32Stride[1] = 0;
-      vFrame->u32Stride[2] = 0;
-      vFrame->u32Length[0] = vFrame->u32Stride[0] * vFrame->u32Height;
-      vFrame->u32Length[1] = 0;
-      vFrame->u32Length[2] = 0;
-    } break;
-    case PIXEL_FORMAT_BF16_C1: {
-      vFrame->u32Stride[0] = ALIGN(vFrame->u32Width * sizeof(uint16_t), DEFAULT_ALIGN);
-      vFrame->u32Stride[1] = 0;
-      vFrame->u32Stride[2] = 0;
-      vFrame->u32Length[0] = vFrame->u32Stride[0] * vFrame->u32Height;
-      vFrame->u32Length[1] = 0;
-      vFrame->u32Length[2] = 0;
-    } break;
-    default:
-      syslog(LOG_ERR, "Currently unsupported format %u\n", vFrame->enPixelFormat);
-      return CVI_FAILURE;
-      break;
+  case PIXEL_FORMAT_RGB_888:
+  case PIXEL_FORMAT_BGR_888: {
+    vFrame->u32Stride[0] = ALIGN(vFrame->u32Width * 3, DEFAULT_ALIGN);
+    vFrame->u32Stride[1] = 0;
+    vFrame->u32Stride[2] = 0;
+    // Don't need to align cause only 1 chn.
+    vFrame->u32Length[0] = vFrame->u32Stride[0] * vFrame->u32Height;
+    vFrame->u32Length[1] = 0;
+    vFrame->u32Length[2] = 0;
+  } break;
+  case PIXEL_FORMAT_RGB_888_PLANAR: {
+    vFrame->u32Stride[0] = ALIGN(vFrame->u32Width, DEFAULT_ALIGN);
+    vFrame->u32Stride[1] = vFrame->u32Stride[0];
+    vFrame->u32Stride[2] = vFrame->u32Stride[0];
+    vFrame->u32Length[0] =
+        ALIGN(vFrame->u32Stride[0] * vFrame->u32Height, SCALAR_4096_ALIGN_BUG);
+    vFrame->u32Length[1] = vFrame->u32Length[0];
+    vFrame->u32Length[2] = vFrame->u32Length[0];
+  } break;
+  case PIXEL_FORMAT_YUV_PLANAR_422: {
+    vFrame->u32Stride[0] = ALIGN(vFrame->u32Width, DEFAULT_ALIGN);
+    vFrame->u32Stride[1] = ALIGN(vFrame->u32Width >> 1, DEFAULT_ALIGN);
+    vFrame->u32Stride[2] = ALIGN(vFrame->u32Width >> 1, DEFAULT_ALIGN);
+    vFrame->u32Length[0] =
+        ALIGN(vFrame->u32Stride[0] * vFrame->u32Height, SCALAR_4096_ALIGN_BUG);
+    vFrame->u32Length[1] =
+        ALIGN(vFrame->u32Stride[1] * vFrame->u32Height, SCALAR_4096_ALIGN_BUG);
+    vFrame->u32Length[2] =
+        ALIGN(vFrame->u32Stride[2] * vFrame->u32Height, SCALAR_4096_ALIGN_BUG);
+  } break;
+  case PIXEL_FORMAT_YUV_PLANAR_420: {
+    uint32_t newHeight = ALIGN(vFrame->u32Height, 2);
+    vFrame->u32Stride[0] = ALIGN(vFrame->u32Width, DEFAULT_ALIGN);
+    vFrame->u32Stride[1] = ALIGN(vFrame->u32Width >> 1, DEFAULT_ALIGN);
+    vFrame->u32Stride[2] = ALIGN(vFrame->u32Width >> 1, DEFAULT_ALIGN);
+    vFrame->u32Length[0] =
+        ALIGN(vFrame->u32Stride[0] * newHeight, SCALAR_4096_ALIGN_BUG);
+    vFrame->u32Length[1] =
+        ALIGN(vFrame->u32Stride[1] * newHeight / 2, SCALAR_4096_ALIGN_BUG);
+    vFrame->u32Length[2] =
+        ALIGN(vFrame->u32Stride[2] * newHeight / 2, SCALAR_4096_ALIGN_BUG);
+  } break;
+  case PIXEL_FORMAT_YUV_400: {
+    vFrame->u32Stride[0] = ALIGN(vFrame->u32Width, DEFAULT_ALIGN);
+    vFrame->u32Stride[1] = 0;
+    vFrame->u32Stride[2] = 0;
+    vFrame->u32Length[0] = vFrame->u32Stride[0] * vFrame->u32Height;
+    vFrame->u32Length[1] = 0;
+    vFrame->u32Length[2] = 0;
+  } break;
+  case PIXEL_FORMAT_FP32_C1: {
+    vFrame->u32Stride[0] =
+        ALIGN(vFrame->u32Width * sizeof(float), DEFAULT_ALIGN);
+    vFrame->u32Stride[1] = 0;
+    vFrame->u32Stride[2] = 0;
+    vFrame->u32Length[0] = vFrame->u32Stride[0] * vFrame->u32Height;
+    vFrame->u32Length[1] = 0;
+    vFrame->u32Length[2] = 0;
+  } break;
+  case PIXEL_FORMAT_BF16_C1: {
+    vFrame->u32Stride[0] =
+        ALIGN(vFrame->u32Width * sizeof(uint16_t), DEFAULT_ALIGN);
+    vFrame->u32Stride[1] = 0;
+    vFrame->u32Stride[2] = 0;
+    vFrame->u32Length[0] = vFrame->u32Stride[0] * vFrame->u32Height;
+    vFrame->u32Length[1] = 0;
+    vFrame->u32Length[2] = 0;
+  } break;
+  default:
+    syslog(LOG_ERR, "Currently unsupported format %u\n", vFrame->enPixelFormat);
+    return CVI_FAILURE;
+    break;
   }
 
-  CVI_U32 u32MapSize = vFrame->u32Length[0] + vFrame->u32Length[1] + vFrame->u32Length[2];
+  CVI_U32 u32MapSize =
+      vFrame->u32Length[0] + vFrame->u32Length[1] + vFrame->u32Length[2];
   *blk = CVI_VB_GetBlock(VB_INVALID_POOLID, u32MapSize);
   if (*blk == VB_INVALID_HANDLE) {
     syslog(LOG_ERR, "Can't acquire vb block Size: %d\n", u32MapSize);
@@ -541,7 +581,8 @@ CREATE_VBFRAME_HELPER(VB_BLK *blk, VIDEO_FRAME_INFO_S *vbFrame, CVI_U32 srcWidth
   vFrame->u64PhyAddr[1] = vFrame->u64PhyAddr[0] + vFrame->u32Length[0];
   vFrame->u64PhyAddr[2] = vFrame->u64PhyAddr[1] + vFrame->u32Length[1];
 
-  vFrame->pu8VirAddr[0] = (uint8_t *)CVI_SYS_MmapCache(vFrame->u64PhyAddr[0], u32MapSize);
+  vFrame->pu8VirAddr[0] =
+      (uint8_t *)CVI_SYS_MmapCache(vFrame->u64PhyAddr[0], u32MapSize);
   vFrame->pu8VirAddr[1] = vFrame->pu8VirAddr[0] + vFrame->u32Length[0];
   vFrame->pu8VirAddr[2] = vFrame->pu8VirAddr[1] + vFrame->u32Length[1];
 
@@ -554,13 +595,16 @@ CREATE_VBFRAME_HELPER(VB_BLK *blk, VIDEO_FRAME_INFO_S *vbFrame, CVI_U32 srcWidth
  *
  * @param frame Input frame.
  */
-inline void __attribute__((always_inline)) CACHED_VBFRAME_FLUSH_UNMAP(VIDEO_FRAME_INFO_S *frame) {
-  uint32_t image_size =
-      frame->stVFrame.u32Length[0] + frame->stVFrame.u32Length[1] + frame->stVFrame.u32Length[2];
-  CVI_SYS_IonFlushCache(frame->stVFrame.u64PhyAddr[0], frame->stVFrame.pu8VirAddr[0], image_size);
-  CVI_SYS_Munmap(
-      (void *)frame->stVFrame.pu8VirAddr[0],
-      frame->stVFrame.u32Length[0] + frame->stVFrame.u32Length[1] + frame->stVFrame.u32Length[2]);
+inline void __attribute__((always_inline))
+CACHED_VBFRAME_FLUSH_UNMAP(VIDEO_FRAME_INFO_S *frame) {
+  uint32_t image_size = frame->stVFrame.u32Length[0] +
+                        frame->stVFrame.u32Length[1] +
+                        frame->stVFrame.u32Length[2];
+  CVI_SYS_IonFlushCache(frame->stVFrame.u64PhyAddr[0],
+                        frame->stVFrame.pu8VirAddr[0], image_size);
+  CVI_SYS_Munmap((void *)frame->stVFrame.pu8VirAddr[0],
+                 frame->stVFrame.u32Length[0] + frame->stVFrame.u32Length[1] +
+                     frame->stVFrame.u32Length[2]);
   frame->stVFrame.pu8VirAddr[0] = NULL;
   frame->stVFrame.pu8VirAddr[1] = NULL;
   frame->stVFrame.pu8VirAddr[2] = NULL;

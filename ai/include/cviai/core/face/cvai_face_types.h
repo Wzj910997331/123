@@ -22,7 +22,12 @@ typedef enum {
  *  @ingroup core_cviaicore
  *  @brief Gender enum for attribute related AI models.
  */
-typedef enum { GENDER_UNKNOWN = 0, GENDER_MALE, GENDER_FEMALE, GENDER_END } cvai_face_gender_e;
+typedef enum {
+  GENDER_UNKNOWN = 0,
+  GENDER_MALE,
+  GENDER_FEMALE,
+  GENDER_END
+} cvai_face_gender_e;
 
 /** @enum cvai_face_race_e
  *  @ingroup core_cviaicore
@@ -38,10 +43,13 @@ typedef enum {
 
 /** @enum cvai_liveness_ir_position_e
  *  @ingroup core_cviaicore
- *  @brief Give liveness AI inference the hint the physical position of the IR camera is on the left
- * or right side of the RGB camera.
+ *  @brief Give liveness AI inference the hint the physical position of the IR
+ * camera is on the left or right side of the RGB camera.
  */
-typedef enum { LIVENESS_IR_LEFT = 0, LIVENESS_IR_RIGHT } cvai_liveness_ir_position_e;
+typedef enum {
+  LIVENESS_IR_LEFT = 0,
+  LIVENESS_IR_RIGHT
+} cvai_liveness_ir_position_e;
 
 /** @struct cvai_head_pose_t
  *  @ingroup core_cviaicore
@@ -62,7 +70,7 @@ typedef struct {
   float roll;
 
   // Facial normal means head direction.
-  float facialUnitNormalVector[3];  // 0: x-axis, 1: y-axis, 2: z-axis
+  float facialUnitNormalVector[3]; // 0: x-axis, 1: y-axis, 2: z-axis
 } cvai_head_pose_t;
 
 /** @struct cvai_dms_od_info_t
@@ -104,7 +112,7 @@ typedef struct {
   uint32_t width;
   uint32_t height;
   meta_rescale_type_e rescale_type;
-  cvai_dms_od_info_t* info;
+  cvai_dms_od_info_t *info;
 } cvai_dms_od_t;
 
 /** @struct cvai_dms_t
@@ -217,8 +225,8 @@ typedef struct {
   uint32_t width;
   uint32_t height;
   meta_rescale_type_e rescale_type;
-  cvai_face_info_t* info;
-  cvai_dms_t* dms;
+  cvai_face_info_t *info;
+  cvai_dms_t *dms;
 } cvai_face_t;
 
 #endif

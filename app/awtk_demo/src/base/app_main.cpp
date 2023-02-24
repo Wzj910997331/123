@@ -7,9 +7,9 @@
 #include "awtk_app_conf.h"
 //#include "awtk_main.inc"
 
-#include <stdio.h>
-#include <signal.h>
 #include "lcd_linux_fb.h"
+#include <signal.h>
+#include <stdio.h>
 
 #include "assets.inc"
 
@@ -41,21 +41,20 @@
 #include "base/asset_loader_zip.h"
 #endif /*IOS*/
 
-#include "home.h"
 #include "cviapp_init.h"
 #include "cviapp_lt9611.h"
+#include "home.h"
 
 #include "cviapp_interface.h"
-
 
 static bool g_bRestartFlag = false;
 uint32_t g_gui_width = CVIAPP_DEFAULT_GUI_WIDTH;
 uint32_t g_gui_height = CVIAPP_DEFAULT_GUI_HEIGHT;
 
 void restart_app(uint32_t w, uint32_t h) {
-    g_gui_width = w;
-    g_gui_height = h;
-    g_bRestartFlag = true;
+  g_gui_width = w;
+  g_gui_height = h;
+  g_bRestartFlag = true;
 }
 
 int gui_app_start(bool restartFlag, int lcd_w, int lcd_h) {
@@ -63,7 +62,8 @@ int gui_app_start(bool restartFlag, int lcd_w, int lcd_h) {
   tk_init(lcd_w, lcd_h, APP_TYPE, APP_NAME, APP_RES_ROOT);
 
 #ifdef ASSETS_ZIP
-  assets_manager_set_loader(assets_manager(), asset_loader_zip_create(ASSETS_ZIP));
+  assets_manager_set_loader(assets_manager(),
+                            asset_loader_zip_create(ASSETS_ZIP));
 #endif /*ASSETS_ZIP*/
 
 #if defined(WITH_LCD_PORTRAIT)
@@ -97,7 +97,7 @@ int gui_app_start(bool restartFlag, int lcd_w, int lcd_h) {
 
   printf("Build at: %s %s\n", __DATE__, __TIME__);
 
-  if(!restartFlag) {
+  if (!restartFlag) {
     GLOBAL_INIT();
     application_init();
 
@@ -118,31 +118,19 @@ int gui_app_start(bool restartFlag, int lcd_w, int lcd_h) {
   return 0;
 }
 
-ret_t application_init(void)
-{
+ret_t application_init(void) { return RET_OK; }
 
-  return RET_OK;
-}
+ret_t application_exit(void) { return RET_OK; }
 
-ret_t application_exit(void)
-{
-  return RET_OK;
-}
-
-ret_t handle_respMsg()
-{
-  return RET_OK;
-}
+ret_t handle_respMsg() { return RET_OK; }
 
 BEGIN_C_DECLS
 extern void main_loop_exit_app_clean(void);
 END_C_DECLS
 
-
-int main(int argc, char* argv[])
-{
-    if(CVIAPP_Init() != CVI_SUCCESS) {
-        printf("CVIAPP_Init() failed\n");
+int main(int argc, char *argv[]) {
+  if (CVIAPP_Init() != CVI_SUCCESS) {
+    printf("CVIAPP_Init() failed\n");
     return -1;
   }
 
@@ -151,9 +139,9 @@ int main(int argc, char* argv[])
 RESTART_APP:
   gui_app_start(restartFlag, g_gui_width, g_gui_height);
 
-  if(g_bRestartFlag) {
-    if(g_gui_width == 1920) {
-    } else if(g_gui_width == 1280) {
+  if (g_bRestartFlag) {
+    if (g_gui_width == 1920) {
+    } else if (g_gui_width == 1280) {
     }
     main_loop_exit_app_clean();
     restartFlag = g_bRestartFlag;

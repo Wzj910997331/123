@@ -10,7 +10,8 @@
 
 /** @enum feature_type_e
  * @ingroup core_cviaicore
- * @brief A variable type enum to present the data type stored in cvai_feature_t.
+ * @brief A variable type enum to present the data type stored in
+ * cvai_feature_t.
  * @see cvai_feature_t
  */
 typedef enum {
@@ -28,11 +29,17 @@ typedef enum {
  * @ingroup core_cviaicore
  * @brief A variable type enum that records the resize padding method.
  */
-typedef enum { RESCALE_UNKNOWN, RESCALE_NOASPECT, RESCALE_CENTER, RESCALE_RB } meta_rescale_type_e;
+typedef enum {
+  RESCALE_UNKNOWN,
+  RESCALE_NOASPECT,
+  RESCALE_CENTER,
+  RESCALE_RB
+} meta_rescale_type_e;
 
 /** @struct cvai_bbox_t
  * @ingroup core_cviaicore
- * @brief A structure to describe an area in a given image with confidence score.
+ * @brief A structure to describe an area in a given image with confidence
+ * score.
  *
  * @var cvai_bbox_t::x1
  * The left-upper x coordinate.
@@ -56,11 +63,12 @@ typedef struct {
 
 /** @struct cvai_feature_t
  * @ingroup core_cviaicore
- * @brief A structure to describe feature. Note that the length of the buffer is size *
- * getFeatureTypeSize(type)
+ * @brief A structure to describe feature. Note that the length of the buffer is
+ * size * getFeatureTypeSize(type)
  *
  * @var cvai_feature_t::ptr
- * The raw pointer of a feature. Need to convert to correct type with feature_type_e.
+ * The raw pointer of a feature. Need to convert to correct type with
+ * feature_type_e.
  * @var cvai_feature_t::size
  * The buffer size of ptr in unit of type.
  * @var cvai_feature_t::type
@@ -69,7 +77,7 @@ typedef struct {
  * @see getFeatureTypeSize()
  */
 typedef struct {
-  int8_t* ptr;
+  int8_t *ptr;
   uint32_t size;
   feature_type_e type;
 } cvai_feature_t;
@@ -86,8 +94,8 @@ typedef struct {
  * The buffer size of x and y in the unit of float.
  */
 typedef struct {
-  float* x;
-  float* y;
+  float *x;
+  float *y;
   uint32_t size;
 } cvai_pts_t;
 
@@ -138,7 +146,7 @@ typedef struct {
  */
 typedef struct {
   uint32_t size;
-  cvai_tracker_info_t* info;
+  cvai_tracker_info_t *info;
 } cvai_tracker_t;
 
 /**
@@ -149,22 +157,23 @@ typedef struct {
  * @return const int The unit size of a variable type.
  */
 
-inline const int __attribute__((always_inline)) getFeatureTypeSize(feature_type_e type) {
+inline const int __attribute__((always_inline))
+getFeatureTypeSize(feature_type_e type) {
   uint32_t size = 1;
   switch (type) {
-    case TYPE_INT8:
-    case TYPE_UINT8:
-      break;
-    case TYPE_INT16:
-    case TYPE_UINT16:
-    case TYPE_BF16:
-      size = 2;
-      break;
-    case TYPE_INT32:
-    case TYPE_UINT32:
-    case TYPE_FLOAT:
-      size = 4;
-      break;
+  case TYPE_INT8:
+  case TYPE_UINT8:
+    break;
+  case TYPE_INT16:
+  case TYPE_UINT16:
+  case TYPE_BF16:
+    size = 2;
+    break;
+  case TYPE_INT32:
+  case TYPE_UINT32:
+  case TYPE_FLOAT:
+    size = 4;
+    break;
   }
   return size;
 }

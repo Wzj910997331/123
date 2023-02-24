@@ -18,19 +18,19 @@
  * 2018-09-09 li xianjing <xianjimli@hotmail.com> created
  *
  */
-#include <stdio.h>
+#include "base/font_manager.h"
 #include "base/idle.h"
 #include "base/timer.h"
-#include "base/font_manager.h"
 #include "base/window_manager.h"
 #include "main_loop/main_loop_simple.h"
 #include "native_window/native_window_raw.h"
+#include <stdio.h>
 
-#include "tslib_thread.h"
 #include "input_thread.h"
-#include "mouse_thread.h"
 #include "lcd_linux_fb.h"
 #include "main_loop_linux.h"
+#include "mouse_thread.h"
+#include "tslib_thread.h"
 
 #include "tkc/cond.h"
 
@@ -54,8 +54,8 @@
 #define MICE_DEVICE_FILENAME "/dev/input/mouse0"
 #endif /*MICE_DEVICE_FILENAME*/
 
-static ret_t main_loop_linux_destroy(main_loop_t* l) {
-  main_loop_simple_t* loop = (main_loop_simple_t*)l;
+static ret_t main_loop_linux_destroy(main_loop_t *l) {
+  main_loop_simple_t *loop = (main_loop_simple_t *)l;
 
   main_loop_simple_reset(loop);
   native_window_raw_deinit();
@@ -63,47 +63,47 @@ static ret_t main_loop_linux_destroy(main_loop_t* l) {
   return RET_OK;
 }
 
-ret_t input_dispatch_to_main_loop(void* ctx, const event_queue_req_t* evt, const char* msg) {
-  main_loop_t* l = (main_loop_t*)ctx;
+ret_t input_dispatch_to_main_loop(void *ctx, const event_queue_req_t *evt,
+                                  const char *msg) {
+  main_loop_t *l = (main_loop_t *)ctx;
   event_queue_req_t event = *evt;
-  event_queue_req_t* e = &event;
+  event_queue_req_t *e = &event;
 
   if (l != NULL && l->queue_event != NULL) {
     switch (e->event.type) {
-      case EVT_KEY_DOWN:
-      case EVT_KEY_UP:
-      case EVT_KEY_LONG_PRESS: {
-        e->event.size = sizeof(e->key_event);
-        break;
-      }
-      case EVT_CONTEXT_MENU:
-      case EVT_POINTER_DOWN:
-      case EVT_POINTER_MOVE:
-      case EVT_POINTER_UP: {
-        e->event.size = sizeof(e->pointer_event);
-        break;
-      }
-      case EVT_WHEEL: {
-        e->event.size = sizeof(e->wheel_event);
-        break;
-      }
-      default:
-        break;
+    case EVT_KEY_DOWN:
+    case EVT_KEY_UP:
+    case EVT_KEY_LONG_PRESS: {
+      e->event.size = sizeof(e->key_event);
+      break;
+    }
+    case EVT_CONTEXT_MENU:
+    case EVT_POINTER_DOWN:
+    case EVT_POINTER_MOVE:
+    case EVT_POINTER_UP: {
+      e->event.size = sizeof(e->pointer_event);
+      break;
+    }
+    case EVT_WHEEL: {
+      e->event.size = sizeof(e->wheel_event);
+      break;
+    }
+    default:
+      break;
     }
 
     main_loop_queue_event(l, e);
-    //input_dispatch_print(ctx, e, msg);
+    // input_dispatch_print(ctx, e, msg);
   } else {
     return RET_BAD_PARAMS;
   }
   return RET_OK;
-
 }
 
-static tk_thread_t* s_kb_thread = NULL;
-static tk_thread_t* s_mice_thread = NULL;
-static tk_thread_t* s_mice_thread1 = NULL;
-static tk_thread_t* s_ts_thread = NULL;
+static tk_thread_t *s_kb_thread = NULL;
+static tk_thread_t *s_mice_thread = NULL;
+static tk_thread_t *s_mice_thread1 = NULL;
+static tk_thread_t *s_ts_thread = NULL;
 
 #if 0
 static void on_app_exit(void) {
@@ -119,9 +119,9 @@ static void on_app_exit(void) {
 }
 #endif
 
-extern void exit_input_thread(tk_thread_t* thread);
-extern void exit_mouse_thread(tk_thread_t* thread);
-extern void exit_tslib_thread(tk_thread_t* thread);
+extern void exit_input_thread(tk_thread_t *thread);
+extern void exit_mouse_thread(tk_thread_t *thread);
+extern void exit_tslib_thread(tk_thread_t *thread);
 extern bool_t lcd_linux_fb_close(void);
 void main_loop_exit_app_clean(void) {
   if (s_kb_thread != NULL) {
@@ -140,27 +140,22 @@ void main_loop_exit_app_clean(void) {
   lcd_linux_fb_close();
 }
 
-static tk_cond_t* __tk_cond;
-static tk_mutex_t* __tk_mutex;
+static tk_cond_t *__tk_cond;
+static tk_mutex_t *__tk_mutex;
 
-static ret_t __main_loop_simple_queue_event_mutex(main_loop_t* l, const event_queue_req_t* r) {
+static ret_t __main_loop_simple_queue_event_mutex(main_loop_t *l,
+                                                  const event_queue_req_t *r) {
   ret_t ret = RET_FAIL;
-  main_loop_simple_t* loop = (main_loop_simple_t*)l;
+  main_loop_simple_t *loop = (main_loop_simple_t *)l;
 
   tk_mutex_lock(__tk_mutex);
 
-  if(r->event.type == EVT_CONTEXT_MENU ||
-        r->event.type == EVT_POINTER_DOWN ||
-        r->event.type == EVT_POINTER_MOVE ||
-        r->event.type == EVT_POINTER_UP)
-  {
+  if (r->event.type == EVT_CONTEXT_MENU || r->event.type == EVT_POINTER_DOWN ||
+      r->event.type == EVT_POINTER_MOVE || r->event.type == EVT_POINTER_UP) {
     ret = event_queue_send(loop->queue, r);
-  }
-  else
-  {
-CHECK_AGAIN:
-    if(loop->queue->full)
-    {
+  } else {
+  CHECK_AGAIN:
+    if (loop->queue->full) {
       printf("awtk queue full, wait...\n");
       tk_cond_wait(__tk_cond, __tk_mutex);
       goto CHECK_AGAIN;
@@ -174,23 +169,22 @@ CHECK_AGAIN:
   return ret;
 }
 
-static ret_t __main_loop_simple_recv_event_mutex(main_loop_t* l, event_queue_req_t* r) {
+static ret_t __main_loop_simple_recv_event_mutex(main_loop_t *l,
+                                                 event_queue_req_t *r) {
   ret_t ret = RET_FAIL;
-  main_loop_simple_t* loop = (main_loop_simple_t*)l;
+  main_loop_simple_t *loop = (main_loop_simple_t *)l;
 
   bool_t isFull = FALSE;
 
   tk_mutex_lock(__tk_mutex);
 
-  if(loop->queue->full)
-  {
-      isFull = TRUE;
+  if (loop->queue->full) {
+    isFull = TRUE;
   }
 
   ret = event_queue_recv(loop->queue, r);
 
-  if(isFull)
-  {
+  if (isFull) {
     printf("cond signal...\n");
     tk_cond_signal(__tk_cond);
   }
@@ -200,11 +194,11 @@ static ret_t __main_loop_simple_recv_event_mutex(main_loop_t* l, event_queue_req
   return ret;
 }
 
-main_loop_t* main_loop_init(int w, int h) {
+main_loop_t *main_loop_init(int w, int h) {
 
-  main_loop_simple_t* loop = NULL;
+  main_loop_simple_t *loop = NULL;
 
-  lcd_t* lcd = lcd_linux_fb_create(FB_DEVICE_FILENAME);
+  lcd_t *lcd = lcd_linux_fb_create(FB_DEVICE_FILENAME);
 
   return_value_if_fail(lcd != NULL, NULL);
 
@@ -213,30 +207,29 @@ main_loop_t* main_loop_init(int w, int h) {
   __tk_mutex = tk_mutex_create();
   __tk_cond = tk_cond_create();
 
-  loop = main_loop_simple_init(w, h, __main_loop_simple_queue_event_mutex, __main_loop_simple_recv_event_mutex);
+  loop = main_loop_simple_init(w, h, __main_loop_simple_queue_event_mutex,
+                               __main_loop_simple_recv_event_mutex);
   loop->base.destroy = main_loop_linux_destroy;
 
 #ifndef ENABLE_HDMI_OUTPUT
-  s_ts_thread =
-      tslib_thread_run(TS_DEVICE_FILENAME, input_dispatch_to_main_loop, loop, lcd->w, lcd->h);
+  s_ts_thread = tslib_thread_run(
+      TS_DEVICE_FILENAME, input_dispatch_to_main_loop, loop, lcd->w, lcd->h);
 #endif
 
-  s_kb_thread =
-      input_thread_run(KB_DEVICE_FILENAME, input_dispatch_to_main_loop, loop, lcd->w, lcd->h);
+  s_kb_thread = input_thread_run(
+      KB_DEVICE_FILENAME, input_dispatch_to_main_loop, loop, lcd->w, lcd->h);
 
 #ifdef ENABLE_HDMI_OUTPUT
 
-    s_mice_thread =
-        mouse_thread_run(KB_DEVICE_FILENAME, input_dispatch_to_main_loop, loop, lcd->w, lcd->h);
+  s_mice_thread = mouse_thread_run(
+      KB_DEVICE_FILENAME, input_dispatch_to_main_loop, loop, lcd->w, lcd->h);
 
-    s_mice_thread1 =
-        mouse_thread_run(TS_DEVICE_FILENAME, input_dispatch_to_main_loop, loop, lcd->w, lcd->h);
-
-
+  s_mice_thread1 = mouse_thread_run(
+      TS_DEVICE_FILENAME, input_dispatch_to_main_loop, loop, lcd->w, lcd->h);
 
 #endif
 
-  //atexit(on_app_exit);
+  // atexit(on_app_exit);
 
-  return (main_loop_t*)loop;
+  return (main_loop_t *)loop;
 }

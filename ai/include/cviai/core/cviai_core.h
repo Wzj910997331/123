@@ -37,7 +37,8 @@
 
 /** @def CVI_AI_CopyInfo
  *  @ingroup core_cviaicore
- * @brief Fully copy the info structure. (including allocating new memory for you.)
+ * @brief Fully copy the info structure. (including allocating new memory for
+ * you.)
  *
  * @param IN Input info structure.
  * @param OUT Output info structure (uninitialized structure required).
@@ -57,8 +58,8 @@
 
 /** @def CVI_AI_RescaleMetaCenter
  * @ingroup core_cviaicore
- * @brief Rescale the output coordinate to original image. Padding in four directions. Support the
- * following structure types written in _Generic.
+ * @brief Rescale the output coordinate to original image. Padding in four
+ * directions. Support the following structure types written in _Generic.
  *
  * @param videoFrame Original input image.
  * @param X Input data structure.
@@ -66,15 +67,17 @@
 
 /** @def CVI_AI_RescaleMetaRB
  * @ingroup core_cviaicore
- * @brief Rescale the output coordinate to original image. Padding in right, bottom directions.
- * Support the following structure types written in _Generic.
+ * @brief Rescale the output coordinate to original image. Padding in right,
+ * bottom directions. Support the following structure types written in _Generic.
  *
  * @param videoFrame Original input image.
  * @param X Input data structure.
  */
 #ifdef __cplusplus
-#define CVI_AI_RescaleMetaCenter(videoFrame, X) CVI_AI_RescaleMetaCenterCpp(videoFrame, X);
-#define CVI_AI_RescaleMetaRB(videoFrame, X) CVI_AI_RescaleMetaRBCpp(videoFrame, X);
+#define CVI_AI_RescaleMetaCenter(videoFrame, X)                                \
+  CVI_AI_RescaleMetaCenterCpp(videoFrame, X);
+#define CVI_AI_RescaleMetaRB(videoFrame, X)                                    \
+  CVI_AI_RescaleMetaRBCpp(videoFrame, X);
 #else
 // clang-format off
 #define CVI_AI_RescaleMetaCenter(videoFrame, X) _Generic((X), \
@@ -142,7 +145,9 @@ typedef void *cviai_handle_t;
  * @brief Supported NN model list. Can be used to config function behavior.
  *
  */
-typedef enum { CVI_AI_MODEL_LIST CVI_AI_SUPPORTED_MODEL_END } CVI_AI_SUPPORTED_MODEL_E;
+typedef enum {
+  CVI_AI_MODEL_LIST CVI_AI_SUPPORTED_MODEL_END
+} CVI_AI_SUPPORTED_MODEL_E;
 #undef CVI_AI_NAME_WRAP
 
 #define CVI_AI_NAME_WRAP(x) #x,
@@ -179,7 +184,8 @@ DLL_EXPORT CVI_S32 CVI_AI_CreateHandle(cviai_handle_t *handle);
  * @param vpssDev Assign a device id to cviai_handle_t.
  * @return int Return CVI_SUCCESS if succeed.
  */
-DLL_EXPORT CVI_S32 CVI_AI_CreateHandle2(cviai_handle_t *handle, const VPSS_GRP vpssGroupId,
+DLL_EXPORT CVI_S32 CVI_AI_CreateHandle2(cviai_handle_t *handle,
+                                        const VPSS_GRP vpssGroupId,
                                         const CVI_U8 vpssDev);
 
 /**
@@ -198,7 +204,8 @@ DLL_EXPORT CVI_S32 CVI_AI_DestroyHandle(cviai_handle_t handle);
  * @param filepath File path to the cvimodel file.
  * @return int Return CVI_SUCCESS if load model succeed.
  */
-DLL_EXPORT CVI_S32 CVI_AI_SetModelPath(cviai_handle_t handle, CVI_AI_SUPPORTED_MODEL_E config,
+DLL_EXPORT CVI_S32 CVI_AI_SetModelPath(cviai_handle_t handle,
+                                       CVI_AI_SUPPORTED_MODEL_E config,
                                        const char *filepath);
 
 /**
@@ -209,7 +216,8 @@ DLL_EXPORT CVI_S32 CVI_AI_SetModelPath(cviai_handle_t handle, CVI_AI_SUPPORTED_M
  * @param filepath Output model path.
  * @return int Return CVI_SUCCESS.
  */
-DLL_EXPORT CVI_S32 CVI_AI_GetModelPath(cviai_handle_t handle, CVI_AI_SUPPORTED_MODEL_E config,
+DLL_EXPORT CVI_S32 CVI_AI_GetModelPath(cviai_handle_t handle,
+                                       CVI_AI_SUPPORTED_MODEL_E config,
                                        char **filepath);
 
 /**
@@ -221,7 +229,8 @@ DLL_EXPORT CVI_S32 CVI_AI_GetModelPath(cviai_handle_t handle, CVI_AI_SUPPORTED_M
  * @return int Return CVI_SUCCESS if load model succeed.
  */
 DLL_EXPORT CVI_S32 CVI_AI_SetSkipVpssPreprocess(cviai_handle_t handle,
-                                                CVI_AI_SUPPORTED_MODEL_E config, bool skip);
+                                                CVI_AI_SUPPORTED_MODEL_E config,
+                                                bool skip);
 
 /**
  * @brief Get skip preprocess value for given supported model.
@@ -232,7 +241,8 @@ DLL_EXPORT CVI_S32 CVI_AI_SetSkipVpssPreprocess(cviai_handle_t handle,
  * @return int Return CVI_SUCCESS.
  */
 DLL_EXPORT CVI_S32 CVI_AI_GetSkipVpssPreprocess(cviai_handle_t handle,
-                                                CVI_AI_SUPPORTED_MODEL_E config, bool *skip);
+                                                CVI_AI_SUPPORTED_MODEL_E config,
+                                                bool *skip);
 
 /**
  * @brief Set the threshold of an AI inference.
@@ -242,7 +252,8 @@ DLL_EXPORT CVI_S32 CVI_AI_GetSkipVpssPreprocess(cviai_handle_t handle,
  * @param threshold Threshold in float, usually a number between 0 and 1.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_SetModelThreshold(cviai_handle_t handle, CVI_AI_SUPPORTED_MODEL_E config,
+DLL_EXPORT CVI_S32 CVI_AI_SetModelThreshold(cviai_handle_t handle,
+                                            CVI_AI_SUPPORTED_MODEL_E config,
                                             float threshold);
 
 /**
@@ -253,35 +264,40 @@ DLL_EXPORT CVI_S32 CVI_AI_SetModelThreshold(cviai_handle_t handle, CVI_AI_SUPPOR
  * @param threshold Threshold in float.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_GetModelThreshold(cviai_handle_t handle, CVI_AI_SUPPORTED_MODEL_E config,
+DLL_EXPORT CVI_S32 CVI_AI_GetModelThreshold(cviai_handle_t handle,
+                                            CVI_AI_SUPPORTED_MODEL_E config,
                                             float *threshold);
 /**
- * @brief Set different vpss thread for each model. Vpss group id is not thread safe. We recommended
- * to change a thread if the process is not sequential.
+ * @brief Set different vpss thread for each model. Vpss group id is not thread
+ * safe. We recommended to change a thread if the process is not sequential.
  *
  * @param handle An AI SDK handle.
  * @param config Supported model type config.
- * @param thread The vpss thread index user desired. Note this param will changed if previous index
- * is not used.
+ * @param thread The vpss thread index user desired. Note this param will
+ * changed if previous index is not used.
  * @return int Return CVI_SUCCESS if successfully changed.
  */
-DLL_EXPORT CVI_S32 CVI_AI_SetVpssThread(cviai_handle_t handle, CVI_AI_SUPPORTED_MODEL_E config,
+DLL_EXPORT CVI_S32 CVI_AI_SetVpssThread(cviai_handle_t handle,
+                                        CVI_AI_SUPPORTED_MODEL_E config,
                                         const uint32_t thread);
 
 /**
- * @brief Set different vpss thread for each model. Vpss group id is not thread safe. We recommended
- * to change a thread if the process is not sequential. This function requires manually assigning a
- * vpss group id.
+ * @brief Set different vpss thread for each model. Vpss group id is not thread
+ * safe. We recommended to change a thread if the process is not sequential.
+ * This function requires manually assigning a vpss group id.
  *
  * @param handle An AI SDK handle.
  * @param config Supported model type config.
- * @param thread The vpss thread index user desired. Note this param will changed if previous index
- * is not used.
- * @param vpssGroupId Assign a vpss group id if a new vpss instance needs to be created.
+ * @param thread The vpss thread index user desired. Note this param will
+ * changed if previous index is not used.
+ * @param vpssGroupId Assign a vpss group id if a new vpss instance needs to be
+ * created.
  * @return int Return CVI_SUCCESS if successfully changed.
  */
-DLL_EXPORT CVI_S32 CVI_AI_SetVpssThread2(cviai_handle_t handle, CVI_AI_SUPPORTED_MODEL_E config,
-                                         const uint32_t thread, const VPSS_GRP vpssGroupId);
+DLL_EXPORT CVI_S32 CVI_AI_SetVpssThread2(cviai_handle_t handle,
+                                         CVI_AI_SUPPORTED_MODEL_E config,
+                                         const uint32_t thread,
+                                         const VPSS_GRP vpssGroupId);
 
 /**
  * @brief Get the set thread index for given supported model.
@@ -291,7 +307,8 @@ DLL_EXPORT CVI_S32 CVI_AI_SetVpssThread2(cviai_handle_t handle, CVI_AI_SUPPORTED
  * @param thread Output thread index.
  * @return int Return CVI_SUCCESS.
  */
-DLL_EXPORT CVI_S32 CVI_AI_GetVpssThread(cviai_handle_t handle, CVI_AI_SUPPORTED_MODEL_E config,
+DLL_EXPORT CVI_S32 CVI_AI_GetVpssThread(cviai_handle_t handle,
+                                        CVI_AI_SUPPORTED_MODEL_E config,
                                         uint32_t *thread);
 
 /**
@@ -302,7 +319,8 @@ DLL_EXPORT CVI_S32 CVI_AI_GetVpssThread(cviai_handle_t handle, CVI_AI_SUPPORTED_
  * @param num Return the length of the list.
  * @return int Return CVI_SUCCESS.
  */
-DLL_EXPORT CVI_S32 CVI_AI_GetVpssGrpIds(cviai_handle_t handle, VPSS_GRP **groups, uint32_t *num);
+DLL_EXPORT CVI_S32 CVI_AI_GetVpssGrpIds(cviai_handle_t handle,
+                                        VPSS_GRP **groups, uint32_t *num);
 
 /**
  * @brief Set VPSS waiting time.
@@ -311,7 +329,8 @@ DLL_EXPORT CVI_S32 CVI_AI_GetVpssGrpIds(cviai_handle_t handle, VPSS_GRP **groups
  * @param timeout Timeout value.
  * @return int Return CVI_SUCCESS.
  */
-DLL_EXPORT CVI_S32 CVI_AI_SetVpssTimeout(cviai_handle_t handle, uint32_t timeout);
+DLL_EXPORT CVI_S32 CVI_AI_SetVpssTimeout(cviai_handle_t handle,
+                                         uint32_t timeout);
 
 /**
  * @brief Close all opened models and delete the model instances.
@@ -328,7 +347,8 @@ DLL_EXPORT CVI_S32 CVI_AI_CloseAllModel(cviai_handle_t handle);
  * @param config Supported model type config.
  * @return int Return CVI_SUCCESS if close succeed.
  */
-DLL_EXPORT CVI_S32 CVI_AI_CloseModel(cviai_handle_t handle, CVI_AI_SUPPORTED_MODEL_E config);
+DLL_EXPORT CVI_S32 CVI_AI_CloseModel(cviai_handle_t handle,
+                                     CVI_AI_SUPPORTED_MODEL_E config);
 
 /**
  * @brief Export vpss channel attribute.
@@ -339,11 +359,15 @@ DLL_EXPORT CVI_S32 CVI_AI_CloseModel(cviai_handle_t handle, CVI_AI_SUPPORTED_MOD
  * @param frameHeight The input frame height.
  * @param idx The index of the input tensors.
  * @param chnAttr Exported VPSS channel config settings.
- * @return int Return CVI_SUCCESS on success, CVI_FAILURE if exporting not supported.
+ * @return int Return CVI_SUCCESS on success, CVI_FAILURE if exporting not
+ * supported.
  */
-DLL_EXPORT CVI_S32 CVI_AI_GetVpssChnConfig(cviai_handle_t handle, CVI_AI_SUPPORTED_MODEL_E config,
-                                           const CVI_U32 frameWidth, const CVI_U32 frameHeight,
-                                           const CVI_U32 idx, cvai_vpssconfig_t *chnConfig);
+DLL_EXPORT CVI_S32 CVI_AI_GetVpssChnConfig(cviai_handle_t handle,
+                                           CVI_AI_SUPPORTED_MODEL_E config,
+                                           const CVI_U32 frameWidth,
+                                           const CVI_U32 frameHeight,
+                                           const CVI_U32 idx,
+                                           cvai_vpssconfig_t *chnConfig);
 
 /**@}*/
 
@@ -358,10 +382,12 @@ DLL_EXPORT CVI_S32 CVI_AI_GetVpssChnConfig(cviai_handle_t handle, CVI_AI_SUPPORT
  *
  * @param handle An AI SDK handle.
  * @param frame Input video frame.
- * @param faces Output detect result. The name, bbox, and face points will be given.
+ * @param faces Output detect result. The name, bbox, and face points will be
+ * given.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_RetinaFace(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_RetinaFace(const cviai_handle_t handle,
+                                     VIDEO_FRAME_INFO_S *frame,
                                      cvai_face_t *faces);
 
 /**
@@ -372,7 +398,8 @@ DLL_EXPORT CVI_S32 CVI_AI_RetinaFace(const cviai_handle_t handle, VIDEO_FRAME_IN
  * @param faces Output detect result. The bbox will be given.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_ThermalFace(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_ThermalFace(const cviai_handle_t handle,
+                                      VIDEO_FRAME_INFO_S *frame,
                                       cvai_face_t *faces);
 
 /**@}*/
@@ -388,23 +415,27 @@ DLL_EXPORT CVI_S32 CVI_AI_ThermalFace(const cviai_handle_t handle, VIDEO_FRAME_I
  *
  * @param handle An AI SDK handle.
  * @param frame Input video frame.
- * @param faces cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must be set.
+ * @param faces cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must
+ * be set.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_FaceAttribute(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_FaceAttribute(const cviai_handle_t handle,
+                                        VIDEO_FRAME_INFO_S *frame,
                                         cvai_face_t *faces);
 
 /**
- * @brief Do face recognition and attribute with bbox info stored in faces. Only do inference on the
- * given index of cvai_face_info_t.
+ * @brief Do face recognition and attribute with bbox info stored in faces. Only
+ * do inference on the given index of cvai_face_info_t.
  *
  * @param handle An AI SDK handle.
  * @param frame Input video frame.
- * @param faces cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must be set.
+ * @param faces cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must
+ * be set.
  * @param face_idx The index of cvai_face_info_t inside cvai_face_t.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_FaceAttributeOne(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_FaceAttributeOne(const cviai_handle_t handle,
+                                           VIDEO_FRAME_INFO_S *frame,
                                            cvai_face_t *faces, int face_idx);
 
 /**
@@ -412,23 +443,27 @@ DLL_EXPORT CVI_S32 CVI_AI_FaceAttributeOne(const cviai_handle_t handle, VIDEO_FR
  *
  * @param handle An AI SDK handle.
  * @param frame Input video frame.
- * @param faces cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must be set.
+ * @param faces cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must
+ * be set.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_FaceRecognition(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_FaceRecognition(const cviai_handle_t handle,
+                                          VIDEO_FRAME_INFO_S *frame,
                                           cvai_face_t *faces);
 
 /**
- * @brief Do face recognition with bbox info stored in faces. Only do inference on the given index
- * of cvai_face_info_t.
+ * @brief Do face recognition with bbox info stored in faces. Only do inference
+ * on the given index of cvai_face_info_t.
  *
  * @param handle An AI SDK handle.
  * @param frame Input video frame.
- * @param faces cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must be set.
+ * @param faces cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must
+ * be set.
  * @param face_idx The index of cvai_face_info_t inside cvai_face_t.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_FaceRecognitionOne(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_FaceRecognitionOne(const cviai_handle_t handle,
+                                             VIDEO_FRAME_INFO_S *frame,
                                              cvai_face_t *faces, int face_idx);
 
 /**
@@ -436,11 +471,13 @@ DLL_EXPORT CVI_S32 CVI_AI_FaceRecognitionOne(const cviai_handle_t handle, VIDEO_
  *
  * @param handle An AI SDK handle.
  * @param frame Input video frame.
- * @param faces cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must be set.
+ * @param faces cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must
+ * be set.
  * @return int Return CVI_SUCCESS on success.
  */
 DLL_EXPORT CVI_S32 CVI_AI_MaskFaceRecognition(const cviai_handle_t handle,
-                                              VIDEO_FRAME_INFO_S *frame, cvai_face_t *faces);
+                                              VIDEO_FRAME_INFO_S *frame,
+                                              cvai_face_t *faces);
 
 /**@}*/
 
@@ -451,43 +488,53 @@ DLL_EXPORT CVI_S32 CVI_AI_MaskFaceRecognition(const cviai_handle_t handle,
 /**@{*/
 
 /**
- * @brief FaceQuality. Gives a score to present how good the image quality of a face is.
+ * @brief FaceQuality. Gives a score to present how good the image quality of a
+ * face is.
  *
  * @param handle An AI SDK handle.
  * @param frame Input video frame.
- * @param face cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must be set.
+ * @param face cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must
+ * be set.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_FaceQuality(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_FaceQuality(const cviai_handle_t handle,
+                                      VIDEO_FRAME_INFO_S *frame,
                                       cvai_face_t *face);
 
-DLL_EXPORT CVI_S32 CVI_AI_GetAlignedFace(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *srcFrame,
-                                         VIDEO_FRAME_INFO_S *dstFrame, cvai_face_info_t *face_info);
+DLL_EXPORT CVI_S32 CVI_AI_GetAlignedFace(const cviai_handle_t handle,
+                                         VIDEO_FRAME_INFO_S *srcFrame,
+                                         VIDEO_FRAME_INFO_S *dstFrame,
+                                         cvai_face_info_t *face_info);
 
 /**
- * @brief Liveness. Gives a score to present how real the face is. The score will be low if the face
- * is not directly taken by a camera.
+ * @brief Liveness. Gives a score to present how real the face is. The score
+ * will be low if the face is not directly taken by a camera.
  *
  * @param handle An AI SDK handle.
  * @param rgbFrame Input RGB video frame.
  * @param irFrame Input IR video frame.
- * @param face cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must be set.
- * @param ir_position The position relationship netween the ir and the rgb camera.
+ * @param face cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must
+ * be set.
+ * @param ir_position The position relationship netween the ir and the rgb
+ * camera.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_Liveness(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *rgbFrame,
-                                   VIDEO_FRAME_INFO_S *irFrame, cvai_face_t *rgb_face,
-                                   cvai_face_t *ir_face);
+DLL_EXPORT CVI_S32 CVI_AI_Liveness(const cviai_handle_t handle,
+                                   VIDEO_FRAME_INFO_S *rgbFrame,
+                                   VIDEO_FRAME_INFO_S *irFrame,
+                                   cvai_face_t *rgb_face, cvai_face_t *ir_face);
 
 /**
  * @brief Mask classification. Tells if a face is wearing a mask.
  *
  * @param handle An AI SDK handle.
  * @param frame Input video frame.
- * @param face cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must be set.
+ * @param face cvai_face_t structure, the cvai_face_info_t and cvai_bbox_t must
+ * be set.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_MaskClassification(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_MaskClassification(const cviai_handle_t handle,
+                                             VIDEO_FRAME_INFO_S *frame,
                                              cvai_face_t *face);
 
 /**@}*/
@@ -498,22 +545,26 @@ DLL_EXPORT CVI_S32 CVI_AI_MaskClassification(const cviai_handle_t handle, VIDEO_
  */
 /**@{*/
 
-DLL_EXPORT CVI_S32 CVI_AI_SelectDetectClass(cviai_handle_t handle, CVI_AI_SUPPORTED_MODEL_E config,
+DLL_EXPORT CVI_S32 CVI_AI_SelectDetectClass(cviai_handle_t handle,
+                                            CVI_AI_SUPPORTED_MODEL_E config,
                                             uint32_t num_classes, ...);
 
 /**
- * @brief MobileDetV2 Vehicle object detection, This model cat detect "car", "truck", "motorbike"
+ * @brief MobileDetV2 Vehicle object detection, This model cat detect "car",
+ * "truck", "motorbike"
  *
  * @param handle An AI SDK handle.
  * @param frame Input video frame.
  * @param obj Output detect result. The name, bbox, and classes will be given.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_Vehicle_D0(cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_Vehicle_D0(cviai_handle_t handle,
+                                                 VIDEO_FRAME_INFO_S *frame,
                                                  cvai_object_t *obj);
 
 /**
- * @brief MobileDetV2 pedestrian object detection, This model cat detect "person" category
+ * @brief MobileDetV2 pedestrian object detection, This model cat detect
+ * "person" category
  *
  * @param handle An AI SDK handle.
  * @param frame Input video frame.
@@ -521,12 +572,13 @@ DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_Vehicle_D0(cviai_handle_t handle, VIDEO_FR
  * @return int Return CVI_SUCCESS on success.
  */
 DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_Pedestrian_D0(cviai_handle_t handle,
-                                                    VIDEO_FRAME_INFO_S *frame, cvai_object_t *obj);
+                                                    VIDEO_FRAME_INFO_S *frame,
+                                                    cvai_object_t *obj);
 
 /**
- * @brief MobileDetV2 Lite object detection, the most lightweight MobileDetV2 with 9 classes
- * detection. This model cat detect "person", "bicycle", "car", "motorbike", "aeroplane", "bus",
- * "train", "truck", and "boat"
+ * @brief MobileDetV2 Lite object detection, the most lightweight MobileDetV2
+ * with 9 classes detection. This model cat detect "person", "bicycle", "car",
+ * "motorbike", "aeroplane", "bus", "train", "truck", and "boat"
  *
  * @param handle An AI SDK handle.
  * @param frame Input video frame.
@@ -534,8 +586,10 @@ DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_Pedestrian_D0(cviai_handle_t handle,
  * @param det_type Specify detection type.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_Lite(cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
-                                           cvai_object_t *obj, cvai_obj_det_type_e det_type);
+DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_Lite(cviai_handle_t handle,
+                                           VIDEO_FRAME_INFO_S *frame,
+                                           cvai_object_t *obj,
+                                           cvai_obj_det_type_e det_type);
 
 /**
  * @brief MobileDetV2 D0 object detection, the most lightweight MobileDetV2.
@@ -546,8 +600,10 @@ DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_Lite(cviai_handle_t handle, VIDEO_FRAME_IN
  * @param det_type Specify detection type.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_D0(cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
-                                         cvai_object_t *obj, cvai_obj_det_type_e det_type);
+DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_D0(cviai_handle_t handle,
+                                         VIDEO_FRAME_INFO_S *frame,
+                                         cvai_object_t *obj,
+                                         cvai_obj_det_type_e det_type);
 
 /**
  * @brief MobileDetV2 D1 object detection, the not so lightweight MobileDetV2.
@@ -558,8 +614,10 @@ DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_D0(cviai_handle_t handle, VIDEO_FRAME_INFO
  * @param det_type Specify detection type.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_D1(cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
-                                         cvai_object_t *obj, cvai_obj_det_type_e det_type);
+DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_D1(cviai_handle_t handle,
+                                         VIDEO_FRAME_INFO_S *frame,
+                                         cvai_object_t *obj,
+                                         cvai_obj_det_type_e det_type);
 
 /**
  * @brief MobileDetV2 D2 object detection, the heaviest MobileDetV2.
@@ -570,8 +628,10 @@ DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_D1(cviai_handle_t handle, VIDEO_FRAME_INFO
  * @param det_type Specify detection type.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_D2(cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
-                                         cvai_object_t *obj, cvai_obj_det_type_e det_type);
+DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_D2(cviai_handle_t handle,
+                                         VIDEO_FRAME_INFO_S *frame,
+                                         cvai_object_t *obj,
+                                         cvai_obj_det_type_e det_type);
 
 /**
  * @brief Yolov3 object detection.
@@ -582,8 +642,9 @@ DLL_EXPORT CVI_S32 CVI_AI_MobileDetV2_D2(cviai_handle_t handle, VIDEO_FRAME_INFO
  * @param det_type Specify detection type.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_Yolov3(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
-                                 cvai_object_t *obj, cvai_obj_det_type_e det_type);
+DLL_EXPORT CVI_S32 CVI_AI_Yolov3(const cviai_handle_t handle,
+                                 VIDEO_FRAME_INFO_S *frame, cvai_object_t *obj,
+                                 cvai_obj_det_type_e det_type);
 
 /**@}*/
 
@@ -598,23 +659,26 @@ DLL_EXPORT CVI_S32 CVI_AI_Yolov3(const cviai_handle_t handle, VIDEO_FRAME_INFO_S
  *
  * @param handle An AI SDK handle.
  * @param frame Input video frame.
- * @param obj cvai_object_t structure, the cvai_object_info_t and cvai_bbox_t must be set.
+ * @param obj cvai_object_t structure, the cvai_object_info_t and cvai_bbox_t
+ * must be set.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_OSNet(cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
-                                cvai_object_t *obj);
+DLL_EXPORT CVI_S32 CVI_AI_OSNet(cviai_handle_t handle,
+                                VIDEO_FRAME_INFO_S *frame, cvai_object_t *obj);
 
 /**
- * @brief Do person Re-Id with bbox info stored in obj. Only do inference on the given index of
- * cvai_object_info_t.
+ * @brief Do person Re-Id with bbox info stored in obj. Only do inference on the
+ * given index of cvai_object_info_t.
  *
  * @param handle An AI SDK handle.
  * @param frame Input video frame.
- * @param obj cvai_object_t structure, the cvai_object_info_t and cvai_bbox_t must be set.
+ * @param obj cvai_object_t structure, the cvai_object_info_t and cvai_bbox_t
+ * must be set.
  * @param obj_idx The index of cvai_object_info_t inside cvai_object_t.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_OSNetOne(cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_OSNetOne(cviai_handle_t handle,
+                                   VIDEO_FRAME_INFO_S *frame,
                                    cvai_object_t *obj, int obj_idx);
 
 /**@}*/
@@ -633,7 +697,8 @@ DLL_EXPORT CVI_S32 CVI_AI_OSNetOne(cviai_handle_t handle, VIDEO_FRAME_INFO_S *fr
  * @param index The index of environment sound classes.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_ESClassification(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_ESClassification(const cviai_handle_t handle,
+                                           VIDEO_FRAME_INFO_S *frame,
                                            int *index);
 
 /**@}*/
@@ -659,7 +724,8 @@ DLL_EXPORT CVI_S32 CVI_AI_DeepSORT_Init(const cviai_handle_t handle);
  * @param ds_conf A deepsort config.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_DeepSORT_GetDefaultConfig(cvai_deepsort_config_t *ds_conf);
+DLL_EXPORT CVI_S32
+CVI_AI_DeepSORT_GetDefaultConfig(cvai_deepsort_config_t *ds_conf);
 
 /**
  * @brief Set deepsort with specific config.
@@ -680,8 +746,10 @@ DLL_EXPORT CVI_S32 CVI_AI_DeepSORT_SetConfig(const cviai_handle_t handle,
  * @param use_reid If true, track by DeepSORT algorithm, else SORT.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_DeepSORT_Obj(const cviai_handle_t handle, cvai_object_t *obj,
-                                       cvai_tracker_t *tracker_t, bool use_reid);
+DLL_EXPORT CVI_S32 CVI_AI_DeepSORT_Obj(const cviai_handle_t handle,
+                                       cvai_object_t *obj,
+                                       cvai_tracker_t *tracker_t,
+                                       bool use_reid);
 
 /**
  * @brief Run SORT track for face.
@@ -692,10 +760,13 @@ DLL_EXPORT CVI_S32 CVI_AI_DeepSORT_Obj(const cviai_handle_t handle, cvai_object_
  * @param use_reid Set false for SORT.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_DeepSORT_Face(const cviai_handle_t handle, cvai_face_t *face,
-                                        cvai_tracker_t *tracker_t, bool use_reid);
+DLL_EXPORT CVI_S32 CVI_AI_DeepSORT_Face(const cviai_handle_t handle,
+                                        cvai_face_t *face,
+                                        cvai_tracker_t *tracker_t,
+                                        bool use_reid);
 
-DLL_EXPORT CVI_S32 CVI_AI_DeepSORT_DebugInfo_1(const cviai_handle_t handle, char *debug_info);
+DLL_EXPORT CVI_S32 CVI_AI_DeepSORT_DebugInfo_1(const cviai_handle_t handle,
+                                               char *debug_info);
 
 /**@}*/
 
@@ -714,8 +785,10 @@ DLL_EXPORT CVI_S32 CVI_AI_DeepSORT_DebugInfo_1(const cviai_handle_t handle, char
  * @param filter Class id filter. Set NULL to ignore.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_DeeplabV3(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
-                                    VIDEO_FRAME_INFO_S *out_frame, cvai_class_filter_t *filter);
+DLL_EXPORT CVI_S32 CVI_AI_DeeplabV3(const cviai_handle_t handle,
+                                    VIDEO_FRAME_INFO_S *frame,
+                                    VIDEO_FRAME_INFO_S *out_frame,
+                                    cvai_class_filter_t *filter);
 /**@}*/
 
 /**
@@ -726,12 +799,12 @@ DLL_EXPORT CVI_S32 CVI_AI_DeeplabV3(const cviai_handle_t handle, VIDEO_FRAME_INF
  * @param vehicle License plate object info
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_LicensePlateRecognition_TW(const cviai_handle_t handle,
-                                                     VIDEO_FRAME_INFO_S *frame,
-                                                     cvai_object_t *vehicle);
-DLL_EXPORT CVI_S32 CVI_AI_LicensePlateRecognition_CN(const cviai_handle_t handle,
-                                                     VIDEO_FRAME_INFO_S *frame,
-                                                     cvai_object_t *vehicle);
+DLL_EXPORT CVI_S32 CVI_AI_LicensePlateRecognition_TW(
+    const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+    cvai_object_t *vehicle);
+DLL_EXPORT CVI_S32 CVI_AI_LicensePlateRecognition_CN(
+    const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+    cvai_object_t *vehicle);
 /**@}*/
 
 /**
@@ -760,7 +833,8 @@ DLL_EXPORT CVI_S32 CVI_AI_LicensePlateDetection(const cviai_handle_t handle,
  * @param vehicle_meta Detected object info
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_AlphaPose(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_AlphaPose(const cviai_handle_t handle,
+                                    VIDEO_FRAME_INFO_S *frame,
                                     cvai_object_t *objects);
 /**@}*/
 
@@ -775,7 +849,8 @@ DLL_EXPORT CVI_S32 CVI_AI_AlphaPose(const cviai_handle_t handle, VIDEO_FRAME_INF
  * @param handle An AI SDK handle.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_Fall(const cviai_handle_t handle, cvai_object_t *objects);
+DLL_EXPORT CVI_S32 CVI_AI_Fall(const cviai_handle_t handle,
+                               cvai_object_t *objects);
 /**@{*/
 
 /**
@@ -792,7 +867,8 @@ DLL_EXPORT CVI_S32 CVI_AI_Fall(const cviai_handle_t handle, cvai_object_t *objec
  * @param moving_score Check the unit diff sum of a frame.
  * @return int Return CVI_SUCCESS on success.
  */
-DLL_EXPORT CVI_S32 CVI_AI_TamperDetection(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_TamperDetection(const cviai_handle_t handle,
+                                          VIDEO_FRAME_INFO_S *frame,
                                           float *moving_score);
 
 /**@}*/
@@ -812,7 +888,8 @@ DLL_EXPORT CVI_S32 CVI_AI_TamperDetection(const cviai_handle_t handle, VIDEO_FRA
  * @return int Return CVI_SUCCESS on success.
  */
 
-DLL_EXPORT CVI_S32 CVI_AI_EyeClassification(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_EyeClassification(const cviai_handle_t handle,
+                                            VIDEO_FRAME_INFO_S *frame,
                                             cvai_face_t *face);
 
 /**
@@ -824,7 +901,8 @@ DLL_EXPORT CVI_S32 CVI_AI_EyeClassification(const cviai_handle_t handle, VIDEO_F
  * @return int Return CVI_SUCCESS on success.
  */
 
-DLL_EXPORT CVI_S32 CVI_AI_YawnClassification(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_YawnClassification(const cviai_handle_t handle,
+                                             VIDEO_FRAME_INFO_S *frame,
                                              cvai_face_t *face);
 /**
  * @brief Do face landmark.
@@ -836,7 +914,8 @@ DLL_EXPORT CVI_S32 CVI_AI_YawnClassification(const cviai_handle_t handle, VIDEO_
  */
 
 DLL_EXPORT CVI_S32 CVI_AI_IncarObjectDetection(const cviai_handle_t handle,
-                                               VIDEO_FRAME_INFO_S *frame, cvai_face_t *face);
+                                               VIDEO_FRAME_INFO_S *frame,
+                                               cvai_face_t *face);
 
 /**@}*/
 
@@ -846,7 +925,8 @@ DLL_EXPORT CVI_S32 CVI_AI_IncarObjectDetection(const cviai_handle_t handle,
  */
 /**@{*/
 
-DLL_EXPORT CVI_S32 CVI_AI_FaceLandmarker(const cviai_handle_t handle, VIDEO_FRAME_INFO_S *frame,
+DLL_EXPORT CVI_S32 CVI_AI_FaceLandmarker(const cviai_handle_t handle,
+                                         VIDEO_FRAME_INFO_S *frame,
                                          cvai_face_t *face);
 /**
  * @brief Do Incar ObjectDetection.
@@ -861,4 +941,4 @@ DLL_EXPORT CVI_S32 CVI_AI_FaceLandmarker(const cviai_handle_t handle, VIDEO_FRAM
 }
 #endif
 
-#endif  // End of _CVIAI_CORE_H_
+#endif // End of _CVIAI_CORE_H_
