@@ -82,7 +82,7 @@ LD_OPTS += -lvpu -lini -lisp -lae -lvenc -lcvi_jpeg -lvdec -lcvitracer -lcvi_vco
 #if enable asan
 #LD_OPTS += -fsanitize=address -fno-omit-frame-pointer -fsanitize-recover=address -lasan
 ifeq ($(ENABLE_CVIAI),yes)
-	LD_OPTS +=  -lnvr_ai -lcviai -lopencv_core -lopencv_imgcodecs -lopencv_imgproc -lcnpy -lcvikernel -lcvimath -lcviruntime -lsns_full -lnanomsg -lcvi_ive_tpu -laf
+	LD_OPTS +=  -lnvr_ai -lcviai -lcviai_app -lopencv_core -lopencv_imgcodecs -lopencv_imgproc -lcnpy -lcvikernel -lcvimath -lcviruntime -lsns_full -lnanomsg -lcvi_ive_tpu -laf
 endif
 SRC_DIR += ./src/base
 SRC_DIR += ./src/ui

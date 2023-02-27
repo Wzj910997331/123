@@ -88,7 +88,6 @@ static void __aiReleaseFrameCallback(uint8_t u8Chn,
 
 static void __aiNotifyCallback(uint8_t u8Chn, CVIAPP_AiResult_S *pResult) {
   CVIAPP_AiDrawRectMsg_S *pmsg = NULL;
-  cvai_object_t *resultInfo = NULL;
   uint32_t i = 0;
 
   if (NULL == pResult) {
@@ -105,6 +104,7 @@ static void __aiNotifyCallback(uint8_t u8Chn, CVIAPP_AiResult_S *pResult) {
   case CVIAPP_AI_CVINVRTHREAD: {
 #if 1
     if ((NULL != g_chnNotifyList[u8Chn]) && (NULL != g_ipcViewPointer[u8Chn])) {
+      cvai_object_t *resultInfo = NULL;
       resultInfo = (cvai_object_t *)pResult->pResult;
       pmsg = CVIAPP_AiAllocDrawRectMsg(resultInfo->size,
                                        CVIAPP_AI_MODEL_RETINAFACE);
@@ -129,6 +129,7 @@ static void __aiNotifyCallback(uint8_t u8Chn, CVIAPP_AiResult_S *pResult) {
     }
 #else
     if ((NULL != g_chnNotifyList[u8Chn]) && (NULL != g_ipcViewPointer[u8Chn])) {
+      CVIAPP_AiResultInfo_S *resultInfo = NULL;
       resultInfo = (CVIAPP_AiResultInfo_S *)pResult->pResult;
       pmsg = CVIAPP_AiAllocDrawRectMsg(resultInfo->face.size,
                                        CVIAPP_AI_MODEL_RETINAFACE);
