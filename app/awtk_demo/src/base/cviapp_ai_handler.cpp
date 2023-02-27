@@ -98,16 +98,14 @@ static void __aiNotifyCallback(uint8_t u8Chn, CVIAPP_AiResult_S *pResult) {
   __oMutex.Lock();
 
   switch (pResult->eType) {
-  case CVIAPP_AI_MODEL_RETINAFACE:
+  case CVIAPP_AI_FACE_CAPTURE:
 
     break;
-  case CVIAPP_AI_CVINVRTHREAD: {
-#if 1
+  case CVIAPP_AI_OBJECT_DETECTION:
     if ((NULL != g_chnNotifyList[u8Chn]) && (NULL != g_ipcViewPointer[u8Chn])) {
       cvai_object_t *resultInfo = NULL;
       resultInfo = (cvai_object_t *)pResult->pResult;
-      pmsg = CVIAPP_AiAllocDrawRectMsg(resultInfo->size,
-                                       CVIAPP_AI_MODEL_RETINAFACE);
+      pmsg = CVIAPP_AiAllocDrawRectMsg(resultInfo->size);
       if ((NULL == resultInfo) || (NULL == pmsg)) {
         break;
       }
@@ -127,12 +125,12 @@ static void __aiNotifyCallback(uint8_t u8Chn, CVIAPP_AiResult_S *pResult) {
 
       idle_queue(g_chnNotifyList[u8Chn], (void *)pmsg);
     }
-#else
+    break;
+  case CVIAPP_AI_FACE_DETECION: {
     if ((NULL != g_chnNotifyList[u8Chn]) && (NULL != g_ipcViewPointer[u8Chn])) {
       CVIAPP_AiResultInfo_S *resultInfo = NULL;
       resultInfo = (CVIAPP_AiResultInfo_S *)pResult->pResult;
-      pmsg = CVIAPP_AiAllocDrawRectMsg(resultInfo->face.size,
-                                       CVIAPP_AI_MODEL_RETINAFACE);
+      pmsg = CVIAPP_AiAllocDrawRectMsg(resultInfo->face.size);
       if ((NULL == resultInfo) || (NULL == pmsg)) {
         break;
       }
@@ -142,10 +140,6 @@ static void __aiNotifyCallback(uint8_t u8Chn, CVIAPP_AiResult_S *pResult) {
                               resultInfo->face.width, resultInfo->face.height,
                               CVIAPP_DEFAULT_GUI_WIDTH,
                               CVIAPP_DEFAULT_GUI_HEIGHT, &pmsg->pr[i]);
-
-        // CVI_NVRLOGD("RETINAFACE face rect(i): %d, %d, %d, %d",
-        //            i, pmsg->pr[i].x, pmsg->pr[i].y,
-        //            pmsg->pr[i].w, pmsg->pr[i].h);
       }
 
       pmsg->sMatchResult = (CVIAPP_MatchFace_S)resultInfo->sMatchResult;
@@ -154,7 +148,6 @@ static void __aiNotifyCallback(uint8_t u8Chn, CVIAPP_AiResult_S *pResult) {
 
       idle_queue(g_chnNotifyList[u8Chn], (void *)pmsg);
     }
-#endif
   } break;
 
   default:
@@ -180,15 +173,33 @@ CVI_ERROR_CODE_E CVIAPP_AiHandlerInit(void) {
   }
 
   CVIAPP_AiParam_S param;
-  memset(&param, 0, sizeof(CVIAPP_AiParam_S));
 
-  param.eType = CVIAPP_AI_CVINVRTHREAD;
+  /*face cature*/
+  memset(&param, 0, sizeof(CVIAPP_AiParam_S));
+  param.eType = CVIAPP_AI_FACE_CAPTURE;
   param.pModelPath = FACE_RETINA_PATH;
+  // param.pNotifyFun = __aiNotifyCallback;
   param.pGetFrameFun = __aiGetFrameCallback;
   param.pReleaseFrameFun = __aiReleaseFrameCallback;
-  param.pNotifyFun = __aiNotifyCallback;
-
   CVIAPP_AiStart(param);
+
+  /*face_dection*/
+  memset(&param, 0, sizeof(CVIAPP_AiParam_S));
+  param.eType = CVIAPP_AI_FACE_DETECION;
+  param.pModelPath = FACE_RETINA_PATH;
+  param.pNotifyFun = __aiNotifyCallback;
+  param.pGetFrameFun = __aiGetFrameCallback;
+  param.pReleaseFrameFun = __aiReleaseFrameCallback;
+  CVIAPP_AiStart(param);
+
+  // /*obj decetion*/
+  // memset(&param, 0, sizeof(CVIAPP_AiParam_S));
+  // param.eType = CVIAPP_AI_OBJECT_DETECTION;
+  // param.pModelPath = PD_MODEL_PATH;
+  // param.pNotifyFun = __aiNotifyCallback;
+  // param.pGetFrameFun = __aiGetFrameCallback;
+  // param.pReleaseFrameFun = __aiReleaseFrameCallback;
+  // CVIAPP_AiStart(param);
 
   return E_CVI_ERROR_CODE_SUCC;
 }
@@ -270,8 +281,7 @@ CVI_ERROR_CODE_E CVIAPP_AiUnregDrawRectNotify(uint8_t u8Chn) {
  * \input eType: The request values;
  * \return: The point of draw rect msg struct.
  */
-CVIAPP_AiDrawRectMsg_S *CVIAPP_AiAllocDrawRectMsg(uint32_t size,
-                                                  CVIAPP_AI_MODEL_E eType) {
+CVIAPP_AiDrawRectMsg_S *CVIAPP_AiAllocDrawRectMsg(uint32_t size) {
   CVIAPP_AiDrawRectMsg_S *p = NULL;
   p = (CVIAPP_AiDrawRectMsg_S *)malloc(sizeof(CVIAPP_AiDrawRectMsg_S));
 
@@ -279,7 +289,6 @@ CVIAPP_AiDrawRectMsg_S *CVIAPP_AiAllocDrawRectMsg(uint32_t size,
     return NULL;
   }
   p->size = size;
-  p->eType = eType;
 
   p->pr = (rect_t *)malloc(sizeof(rect_t) * size);
 

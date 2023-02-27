@@ -59,8 +59,7 @@ CVI_ERROR_CODE_E CVIAPP_AiRegDrawRectNotify(void *pIpcView, uint8_t u8Chn,
                                             idle_func_t on_idle);
 CVI_ERROR_CODE_E CVIAPP_AiUnregDrawRectNotify(uint8_t u8Chn);
 
-CVIAPP_AiDrawRectMsg_S *CVIAPP_AiAllocDrawRectMsg(uint32_t size,
-                                                  CVIAPP_AI_MODEL_E eType);
+CVIAPP_AiDrawRectMsg_S *CVIAPP_AiAllocDrawRectMsg(uint32_t size);
 
 CVI_ERROR_CODE_E CVIAPP_AiFreeDrawRectMsg(CVIAPP_AiDrawRectMsg_S *pmsg);
 
