@@ -175,13 +175,13 @@ CVI_ERROR_CODE_E CVIAPP_AiHandlerInit(void) {
   CVIAPP_AiParam_S param;
 
   /*face cature*/
-  memset(&param, 0, sizeof(CVIAPP_AiParam_S));
-  param.eType = CVIAPP_AI_FACE_CAPTURE;
-  param.pModelPath = FACE_RETINA_PATH;
-  // param.pNotifyFun = __aiNotifyCallback;
-  param.pGetFrameFun = __aiGetFrameCallback;
-  param.pReleaseFrameFun = __aiReleaseFrameCallback;
-  CVIAPP_AiStart(param);
+  // memset(&param, 0, sizeof(CVIAPP_AiParam_S));
+  // param.eType = CVIAPP_AI_FACE_CAPTURE;
+  // param.pModelPath = FACE_RETINA_PATH;
+  // // param.pNotifyFun = __aiNotifyCallback;
+  // param.pGetFrameFun = __aiGetFrameCallback;
+  // param.pReleaseFrameFun = __aiReleaseFrameCallback;
+  // CVIAPP_AiStart(param);
 
   /*face_dection*/
   memset(&param, 0, sizeof(CVIAPP_AiParam_S));

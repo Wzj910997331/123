@@ -301,7 +301,6 @@ static void *__FaceDetectThread(void *args) {
   CVIAPP_AiContext__S *pCtx = (CVIAPP_AiContext__S *)args;
 
   cviai_handle_t cviai_handle;
-  printf("fffffffffffffffffff3333333333333333333333333333333 %s %d\n\n\n\n", pCtx->stParam.pModelPath, pCtx->stParam.eType);
   CVI_NVRLOGD("__FaceDetectThread  start....");
   CVI_AI_CreateHandle2(&cviai_handle, 3, __VPSS_DEV_AI_HANDLE);
   CVI_AI_OpenModel(cviai_handle, CVI_AI_SUPPORTED_MODEL_RETINAFACE,
@@ -505,7 +504,6 @@ static void *__cviFaceCapThread(void *args) {
   float det_threshold = 0.5;
   bool write_image = true;
   int ret = 0;
-  printf("fffffffffffffffffff111111111111111111111111111111111 %s %d\n\n\n\n", pCtx->stParam.pModelPath, pCtx->stParam.eType);
   CVI_NVRLOGD("__cviFaceCapThread  start.... %s", FACE_RETINA_PATH);
 
   CVI_AI_CreateHandle2(&ai_handle, 5, __VPSS_DEV_AI_HANDLE);
@@ -648,7 +646,6 @@ static void *__aiObjectDetectThread(void *args) {
   cviai_handle_t cviai_handle;
   CVI_S32 s32Ret = CVI_SUCCESS;
   CVIAPP_AiContext__S *pCtx = (CVIAPP_AiContext__S *)args;
-  printf("fffffffffffffffffff222222222222222222222222222222222222  %s %d\n\n\n\n", pCtx->stParam.pModelPath, pCtx->stParam.eType);
   CVI_NVRLOGD("__aiObjectDetectThread thread start...");
 
   CVI_AI_CreateHandle2(&cviai_handle, 4, __VPSS_DEV_AI_HANDLE);
